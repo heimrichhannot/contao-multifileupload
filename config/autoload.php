@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2005-2015 Leo Feyer
  *
- * @package Dropzone
+ * @package Multifileupload
  * @link    https://contao.org
  * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  */
@@ -26,10 +26,10 @@ ClassLoader::addNamespaces(array
 ClassLoader::addClasses(array
 (
 	// Forms
-	'HeimrichHannot\MultiFileUpload\FormMultiFileUpload' => 'system/modules/dropzone/forms/FormMultiFileUpload.php',
+	'HeimrichHannot\MultiFileUpload\FormMultiFileUpload' => 'system/modules/multifileupload/forms/FormMultiFileUpload.php',
 
 	// Classes
-	'HeimrichHannot\MultiFileUpload\MultiFileUpload'     => 'system/modules/dropzone/classes/MultiFileUpload.php',
+	'HeimrichHannot\MultiFileUpload\MultiFileUpload'     => 'system/modules/multifileupload/classes/MultiFileUpload.php',
 ));
 
 
@@ -38,6 +38,6 @@ ClassLoader::addClasses(array
  */
 TemplateLoader::addFiles(array
 (
-	'form_multifileupload_dropzone' => 'system/modules/dropzone/templates/forms',
-	'j_multifileupload_dropzone'        => 'system/modules/dropzone/templates/jquery',
+	'form_multifileupload_dropzone' => 'system/modules/multifileupload/templates/forms',
+	'j_multifileupload_dropzone'    => 'system/modules/multifileupload/templates/jquery',
 ));
