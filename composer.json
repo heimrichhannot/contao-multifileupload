@@ -1,0 +1,34 @@
+{
+    "name": "heimrichhannot/contao-multifileupload",
+    "description":"Contao front end widget that provides dropzonejs.com functionality.",
+    "keywords":["contao", "multi", "file", "upload", "dropzone", "widget"],
+    "type": "contao-module",
+    "homepage":"https://github.com/heimrichhannot/contao-multifileupload",
+    "license":"LGPL-3.0+",
+    "authors":[
+        {
+            "name":"Heimrich & Hannot",
+            "email":"digitales@heimrich-hannot.de",
+            "homepage":"http://www.heimrich-hannot.de",
+            "role":"Developer"
+        }
+    ],
+    "support":{
+        "issues":"https://github.com/heimrichhannot/contao-multifileupload/issues"
+    },
+    "require": {
+        "contao/core": ">=3.3,<4-dev",
+        "contao-community-alliance/composer-installer": "*",
+        "heimrichhannot/contao-haste_plus": ">=1.0.17"
+    },
+    "autoload": {
+        "classmap": [""]
+    },
+    "extra": {
+        "contao": {
+            "sources": {
+                "": "system/modules/multifileupload"
+            }
+        }
+    }
+}

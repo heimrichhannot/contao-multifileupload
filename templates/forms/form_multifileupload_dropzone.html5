@@ -1,0 +1,38 @@
+<?php $this->extend('form_row'); ?>
+
+<?php $this->block('label'); ?>
+<?php if ($this->label): ?>
+	<label style="font-weight: bold;" for="ctrl_<?php echo $this->id; ?>"<?php if ($this->class): ?> class="<?php echo $this->class; ?>"<?php endif; ?>>
+		<?php if ($this->mandatory): ?>
+			<span class="invisible"><?php echo $this->mandatoryField; ?></span> <?php echo $this->label; ?><span class="mandatory">*</span>
+		<?php else: ?>
+			<?php echo $this->label; ?>
+		<?php endif; ?>
+	</label>
+<?php endif; ?>
+<?php $this->endblock(); ?>
+
+<?php $this->block('field'); ?>
+<div class="multifileupload dropzone<?php if ($this->class) {echo ' ' . $this->class;} ?>" id="ctrl_<?= $this->id; ?>">
+	<input type="hidden" name="formattedInitial_<?= $this->id ?>" value='<?= $this->initialFilesFormatted ?>'>
+	<input type="hidden" name="uploaded_<?= $this->id ?>" value='[]'>
+	<input type="hidden" name="deleted_<?= $this->id ?>" value='[]'>
+
+	<input type="hidden" name="<?= $this->id ?>" value='<?= $this->initialFiles ?>'>
+
+	<div class="fallback">
+		<input type="file" name="<?php echo $this->name; ?><?php if ($this->uploadMultiple): ?>[]<?php endif; ?>"<?php if ($this->uploadMultiple): ?> multiple<?php endif; ?>>
+	</div>
+
+	<div class="dz-container">
+		<div class="dz-default dz-message">
+			<span class="dz-message-head"><?= $this->labels['head']; ?></span>
+			<span class="dz-message-body"><?= $this->labels['body']; ?></span>
+			<span class="dz-message-foot"><?= $this->labels['foot']; ?></span>
+		</div>
+		<div class="dropzone-previews"></div>
+	</div>
+</div>
+<?= $this->js; ?>
+
+<?php $this->endblock(); ?>

@@ -1,0 +1,162 @@
+<script>
+	(function($){
+		$(document).ready(function() {
+			Dropzone.autoDiscover = false;
+
+			function getFileField(dropzone, formfield, name) {
+				return $(dropzone.element).find('input[name="' + (typeof name !== 'undefined' ? name + '_' : '') + formfield + '"]')
+			}
+
+			new Dropzone('#ctrl_<?php echo $this->id; ?>', {
+				url : HASTE_PLUS.addParametersToUri(location.href, {
+					multiple: <?= $this->uploadMultiple ? 1 : 0; ?>,
+					isAjax: 1,
+					requestToken: '<?= \RequestToken::get() ?>'
+				}),
+				paramName: '<?php echo $this->name; ?>',
+				maxFilesize: '<?php echo $this->maxFilesize; ?>',
+				acceptedFiles: '<?php echo $this->acceptedFiles; ?>',
+				previewsContainer: '#ctrl_<?php echo $this->id; ?> .dropzone-previews',
+				uploadMultiple: <?php echo $this->uploadMultiple ? 'true' : 'false'; ?>,
+				maxFiles: <?php echo ($this->uploadMultiple ? ($this->maxFiles ?: 'null') : '1'); ?>,
+				addRemoveLinks: <?php echo ($this->addRemoveLinks ? 'true' : 'false'); ?>,
+				minImageWidth: <?= $this->minImageWidth ?>,
+				minImageHeight: <?= $this->minImageHeight ?>,
+				createImageThumbnails: <?= $this->minImageWidth || $this->minImageHeight ? 'true' : 'false' ?>,
+				<?php foreach ($this->messages as $strKey => $strValue): ?>
+					<?= $strKey ?>: '<?= addslashes($strValue) ?>'.replace(/{\.{/g, '{{').replace(/}\.}/g, '}}'),
+				<?php endforeach; ?>
+				init: function() {
+					// listeners
+					this.on('addedfile', function(file) {
+						$('#ctrl_<?php echo $this->id; ?>').find('.dz-default').hide();
+					}).on('thumbnail', function(file, dataUrl) {
+						if (file.width < this.options.minImageWidth || file.height < this.options.minImageHeight) {
+							if (typeof file.rejectDimensions === 'function')
+								file.rejectDimensions();
+						}
+						else {
+							if (typeof file.acceptDimensions === 'function')
+								file.acceptDimensions();
+						}
+					}).on('removedfile', function(file) {
+						if ($('#ctrl_<?php echo $this->id; ?>').find('.dropzone-previews').children().length <= 0)
+							$('#ctrl_<?php echo $this->id; ?>').find('.dz-default').show();
+
+						// also remove the file from the server
+						if (file.accepted)
+						{
+							var uploaded = getFileField(this, '<?php echo $this->id; ?>', 'uploaded'),
+									deleted = getFileField(this, '<?php echo $this->id; ?>', 'deleted'),
+									filesToSave = getFileField(this, '<?php echo $this->id; ?>');
+
+							if (typeof uploaded !== 'undefined')
+							{
+								var arrUploaded = JSON.parse(uploaded.val());
+
+								uploaded.val(JSON.stringify(HASTE_PLUS.removeFromArray(file.uuid, arrUploaded)));
+							}
+
+							if (typeof filesToSave !== 'undefined')
+							{
+								var arrFilesToSave = JSON.parse(filesToSave.val());
+
+								filesToSave.val(JSON.stringify(HASTE_PLUS.removeFromArray(file.uuid, arrFilesToSave)));
+							}
+
+							if (typeof deleted !== 'undefined')
+							{
+								var arrDeleted = JSON.parse(deleted.val());
+
+								arrDeleted.push(file.uuid);
+								deleted.val(JSON.stringify(arrDeleted));
+							}
+
+//							$.ajax({
+//								url: HASTE_PLUS.addParametersToUri(this.options.url, {
+//									action: 'remove',
+//									uuid: file.uuid,
+//									field: '<?php //echo $this->id; ?>//'
+//								}),
+//								cache: false
+//							});
+						}
+					}).on('success', function (file, response) {
+						response = JSON.parse(response);
+
+						var uploaded = getFileField(this, '<?php echo $this->id; ?>', 'uploaded'),
+							filesToSave = getFileField(this, '<?php echo $this->id; ?>');
+
+						if ($.isArray(response))
+						{
+							$.each(response, function() {
+								if (this.filenameOrig == file.name)
+								{
+									file.serverFileName = this.filename;
+									file.uuid = this.uuid;
+								}
+							});
+						}
+						else
+						{
+							file.serverFileName = response.filename;
+							file.uuid = response.uuid;
+						}
+
+						if (typeof uploaded !== 'undefined')
+						{
+							var arrUploaded = JSON.parse(uploaded.val());
+
+							arrUploaded.push(file.uuid);
+							uploaded.val(JSON.stringify(arrUploaded));
+						}
+
+						if (typeof filesToSave !== 'undefined')
+						{
+							var arrFilesToSave = JSON.parse(filesToSave.val());
+
+							arrFilesToSave.push(file.uuid);
+							filesToSave.val(JSON.stringify(arrFilesToSave));
+						}
+					});
+
+					// add mock files
+					var initialFiles = getFileField(this, '<?php echo $this->id; ?>', 'formattedInitial').val(),
+						dropzone = this;
+
+					if (typeof initialFiles !== 'undefined' && initialFiles != '')
+					{
+						initialFiles = JSON.parse(initialFiles);
+
+						$.each(initialFiles, function() {
+							// !!
+							this.accepted = true;
+							this.status = 'success';
+							this.mock = true;
+
+							dropzone.emit('addedfile', this);
+							dropzone.emit('complete', this);
+
+							dropzone.files.push(this);
+						});
+					}
+				},
+				accept: function(file, done) {
+					var dropzone = this;
+
+					if (!this.options.createImageThumbnails)
+						done();
+
+					file.acceptDimensions = done;
+					file.rejectDimensions = function() {
+						done(dropzone.options.dictImageDimensionsTooSmall
+								.replace(/\{\{minImageWidth\}\}/, dropzone.options.minImageWidth)
+								.replace(/\{\{minImageHeight\}\}/, dropzone.options.minImageHeight));
+					};
+				}
+			})
+		});
+
+	})(jQuery)
+
+</script>
