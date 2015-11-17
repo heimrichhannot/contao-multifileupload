@@ -29,7 +29,7 @@
 				init: function() {
 					// listeners
 					this.on('addedfile', function(file) {
-						$('#ctrl_<?php echo $this->id; ?>').find('.dz-default').hide();
+						$('#ctrl_<?php echo $this->id; ?>').find('.dz-default').addClass('nodefault').find('span').hide();
 					}).on('thumbnail', function(file, dataUrl) {
 						if (file.width < this.options.minImageWidth || file.height < this.options.minImageHeight) {
 							if (typeof file.rejectDimensions === 'function')
@@ -41,7 +41,7 @@
 						}
 					}).on('removedfile', function(file) {
 						if ($('#ctrl_<?php echo $this->id; ?>').find('.dropzone-previews').children().length <= 0)
-							$('#ctrl_<?php echo $this->id; ?>').find('.dz-default').show();
+							$('#ctrl_<?php echo $this->id; ?>').find('.dz-default').removeClass('nodefault').find('span').show();
 
 						// also remove the file from the server
 						if (file.accepted)
