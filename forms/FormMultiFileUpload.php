@@ -148,12 +148,14 @@ class FormMultiFileUpload extends \Upload
 
 	public function deleteScheduledFiles($arrScheduledFiles)
 	{
-		foreach ($arrScheduledFiles as $strUuid)
+		if(!empty($arrScheduledFiles))
 		{
-			if (($objFile = Files::getFileFromUuid($strUuid, true)) !== null)
+			foreach ($arrScheduledFiles as $strUuid)
 			{
-				if ($objFile->exists())
+				if (($objFile = Files::getFileFromUuid($strUuid, true)) !== null && $objFile->exists())
+				{
 					$objFile->delete();
+				}
 			}
 		}
 	}

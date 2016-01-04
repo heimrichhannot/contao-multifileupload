@@ -113,7 +113,7 @@ class MultiFileUpload extends \FileUpload
 
 	protected function prepareFile($varUuid)
 	{
-		if (($objFile = Files::getFileFromUuid($varUuid, true)) !== null)
+		if (($objFile = Files::getFileFromUuid($varUuid, true)) !== null && $objFile->exists())
 		{
 			return array(
 				// remove timestamp from filename
