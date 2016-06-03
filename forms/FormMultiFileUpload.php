@@ -14,7 +14,7 @@ namespace HeimrichHannot\MultiFileUpload;
 
 use Contao\RequestToken;
 use Contao\Validator;
-use HeimrichHannot\HastePlus\Files;
+use HeimrichHannot\Haste\Util\Files;
 
 class FormMultiFileUpload extends \Upload
 {
@@ -34,14 +34,14 @@ class FormMultiFileUpload extends \Upload
 			{
 				$arrAttributes['value'] = array_map(
 						function($val) {
-							return \String::binToUuid($val);
+							return \StringUtil::binToUuid($val);
 						}, $arrAttributes['value']
 				);
 			}
 			else
 			{
 				$arrAttributes['value'] = array(
-					\String::binToUuid($arrAttributes['value'])
+					\StringUtil::binToUuid($arrAttributes['value'])
 				);
 			}
 		}
@@ -50,7 +50,7 @@ class FormMultiFileUpload extends \Upload
 		$this->objUploader = new MultiFileUpload($arrAttributes);
 
 		// TODO atm ajax-only
-		if (!\Input::get('isAjax'))
+		if (!\Input::get('isAjaxUpload'))
 			return;
 
 		$strAction = \Input::get('action');
@@ -58,6 +58,9 @@ class FormMultiFileUpload extends \Upload
 		// check for the request token
 		if (!\Input::get('requestToken') || !RequestToken::validate(\Input::get('requestToken')))
 			die('Invalid Request Token!');
+
+		// create if not existing
+		new \Folder($this->objUploader->uploadFolder);
 
 		$strUploadFolder = rtrim($this->objUploader->uploadFolder, '/');
 
@@ -136,7 +139,7 @@ class FormMultiFileUpload extends \Upload
 			return array(
 				'filename' => $strTargetFileName,
 				'filenameOrig' => $arrFile['name'],
-				'uuid' => \String::binToUuid($objFile->getModel()->uuid),
+				'uuid' => \StringUtil::binToUuid($objFile->getModel()->uuid),
 				'size' => $objFile->filesize,
 			);
 		}

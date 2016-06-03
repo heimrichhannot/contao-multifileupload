@@ -12,8 +12,8 @@
 
 namespace HeimrichHannot\MultiFileUpload;
 
-use HeimrichHannot\HastePlus\Files;
-use HeimrichHannot\HastePlus\Strings;
+use HeimrichHannot\Haste\Util\Files;
+use HeimrichHannot\Haste\Util\StringUtil;
 
 class MultiFileUpload extends \FileUpload
 {
@@ -117,8 +117,8 @@ class MultiFileUpload extends \FileUpload
 		{
 			return array(
 				// remove timestamp from filename
-				'name' => Strings::preg_replace_last('@_\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2}@', $objFile->name),
-				'uuid' => \String::binToUuid($objFile->getModel()->uuid),
+				'name' => StringUtil::preg_replace_last('@_\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2}@', $objFile->name),
+				'uuid' => \StringUtil::binToUuid($objFile->getModel()->uuid),
 				'size' => $objFile->filesize
 			);
 		}

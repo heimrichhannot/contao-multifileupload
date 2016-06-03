@@ -10,7 +10,7 @@
 			new Dropzone('#ctrl_<?php echo $this->id; ?>', {
 				url : HASTE_PLUS.addParametersToUri(location.href, {
 					multiple: <?= $this->uploadMultiple ? 1 : 0; ?>,
-					isAjax: 1,
+					isAjaxUpload: 1,
 					requestToken: '<?= \RequestToken::get() ?>'
 				}),
 				paramName: '<?php echo $this->name; ?>',

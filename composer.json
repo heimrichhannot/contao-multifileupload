@@ -19,8 +19,8 @@
     "require": {
         "contao/core": ">=3.3,<4-dev",
         "contao-community-alliance/composer-installer": "*",
-        "heimrichhannot/contao-haste_plus": ">=1.0.16"
-    },
+		"heimrichhannot/contao-haste_plus": ">=1.4.0"
+	},
     "autoload": {
         "classmap": [""]
     },
