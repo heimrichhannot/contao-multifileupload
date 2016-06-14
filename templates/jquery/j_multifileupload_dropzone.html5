@@ -7,8 +7,15 @@
 				return $(dropzone.element).find('input[name="' + (typeof name !== 'undefined' ? name + '_' : '') + formfield + '"]')
 			}
 
+			var url = location.href;
+
+			if (history.state != null)
+			{
+				url = history.state.url;
+			}
+
 			new Dropzone('#ctrl_<?php echo $this->id; ?>', {
-				url : HASTE_PLUS.addParametersToUri(location.href, {
+				url : HASTE_PLUS.addParametersToUri(url, {
 					multiple: <?= $this->uploadMultiple ? 1 : 0; ?>,
 					isAjaxUpload: 1,
 					requestToken: '<?= \RequestToken::get() ?>'
