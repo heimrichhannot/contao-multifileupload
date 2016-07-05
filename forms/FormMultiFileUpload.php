@@ -24,6 +24,8 @@ class FormMultiFileUpload extends \Upload
 
 	public function __construct($arrAttributes=null)
 	{
+		$this->strName = $this->strId = $arrAttributes['name'];
+
 		// bin to string
 		if (!is_array($arrAttributes['value']) && !Validator::isBinaryUuid($arrAttributes['value']))
 			$arrAttributes['value'] = json_decode($arrAttributes['value']);
