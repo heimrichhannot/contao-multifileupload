@@ -27,6 +27,7 @@ class FormMultiFileUpload extends \Upload
 		$this->strName = $this->strId = $arrAttributes['name'];
 		$this->explanation = $arrAttributes['explanation'];
 		$this->mandatory = $arrAttributes['mandatory'];
+		$this->invisible = $arrAttributes['invisible'];
 
 		// bin to string
 		if (!is_array($arrAttributes['value']) && !Validator::isBinaryUuid($arrAttributes['value']))
