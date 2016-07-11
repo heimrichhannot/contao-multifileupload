@@ -97,7 +97,7 @@ class MultiFileUpload extends \FileUpload
 	}
 
 	protected function prepareValue() {
-		if (!empty($this->value))
+			if (!empty($this->value))
 		{
 			$arrResult = array();
 
@@ -117,7 +117,7 @@ class MultiFileUpload extends \FileUpload
 		{
 			return array(
 				// remove timestamp from filename
-				'name' => StringUtil::preg_replace_last('@_\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2}@', $objFile->name),
+				'name' => StringUtil::preg_replace_last('@_[a-f0-9]{13}@', $objFile->name),
 				'uuid' => \StringUtil::binToUuid($objFile->getModel()->uuid),
 				'size' => $objFile->filesize
 			);

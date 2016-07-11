@@ -33,24 +33,6 @@ class FormMultiFileUpload extends \Upload
 		if (!is_array($arrAttributes['value']) && !Validator::isBinaryUuid($arrAttributes['value']))
 			$arrAttributes['value'] = json_decode($arrAttributes['value']);
 
-		if ($arrAttributes['value'])
-		{
-			if (is_array($arrAttributes['value']))
-			{
-				$arrAttributes['value'] = array_map(
-						function($val) {
-							return \StringUtil::binToUuid($val);
-						}, $arrAttributes['value']
-				);
-			}
-			else
-			{
-				$arrAttributes['value'] = array(
-					\StringUtil::binToUuid($arrAttributes['value'])
-				);
-			}
-		}
-
 		//parent::__construct($arrAttributes);
 		$this->objUploader = new MultiFileUpload($arrAttributes);
 
@@ -167,7 +149,7 @@ class FormMultiFileUpload extends \Upload
 
 			// example testfile.png -> testfile_2015_12_29_16_08.png
 			$strTargetFileName = Files::sanitizeFileName($arrPath['filename']) . '_' .
-					date('Y_m_d-H_i_s', time()) . '.' . $arrPath['extension'];
+				uniqid() . '.' . $arrPath['extension'];
 			$strTargetFile =  $strUploadFolder . '/' . $strTargetFileName;
 
 			move_uploaded_file($strTempFile, TL_ROOT . '/' . $strTargetFile);
