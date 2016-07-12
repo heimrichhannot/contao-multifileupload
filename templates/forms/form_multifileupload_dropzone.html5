@@ -14,11 +14,11 @@
 
 <?php $this->block('field'); ?>
 <div class="multifileupload dropzone<?php if ($this->class) {echo ' ' . $this->class;} ?>" id="ctrl_<?= $this->id; ?>">
-	<input type="hidden" name="formattedInitial_<?= $this->id ?>" value="<?= $this->initialFilesFormatted ?: '[]' ?>">
+	<input type="hidden" name="formattedInitial_<?= $this->id ?>" value='<?= $this->initialFilesFormatted ?: '[]' ?>'>
 	<input type="hidden" name="uploaded_<?= $this->id ?>" value='[]'>
 	<input type="hidden" name="deleted_<?= $this->id ?>" value='[]'>
 
-	<input type="hidden" name="<?= $this->id ?>" value="<?= $this->initialFiles ?: '[]' ?>">
+	<input type="hidden" name="<?= $this->id ?>" value='<?= $this->initialFiles ?: '[]' ?>'>
 
 	<div class="fallback">
 		<input type="file" name="<?php echo $this->name; ?><?php if ($this->uploadMultiple): ?>[]<?php endif; ?>"<?php if ($this->uploadMultiple): ?> multiple<?php endif; ?>>
