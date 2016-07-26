@@ -136,7 +136,7 @@ class FormMultiFileUpload extends \Upload
 			($this->mandatory ? '<span class="mandatory">*</span>' : ''));
 	}
 
-	protected function validator($varInput)
+	public function validator($varInput)
 	{
 		if ($varInput == '[]' || !$varInput)
 		{
@@ -172,15 +172,16 @@ class FormMultiFileUpload extends \Upload
 
 			// add db record
 			$objFile = new \File($strTargetFile);
-			// create the file model
-			$objFile->close();
+			$strUuid = \StringUtil::binToUuid(\Dbafs::addResource($objFile->value)->uuid);
 
-			return array(
+			$arrData =  array(
 				'filename' => $strTargetFileName,
 				'filenameOrig' => $arrFile['name'],
-				'uuid' => \StringUtil::binToUuid($objFile->getModel()->uuid),
+				'uuid' => $strUuid,
 				'size' => $objFile->filesize,
 			);
+			
+			return $arrData;
 		}
 	}
 

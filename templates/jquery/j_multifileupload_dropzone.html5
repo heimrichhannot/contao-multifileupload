@@ -14,7 +14,7 @@
 				url = history.state.url;
 			}
 
-			new Dropzone('#ctrl_<?php echo $this->id; ?>', {
+			var dropzone = new Dropzone('#ctrl_<?php echo $this->id; ?>', {
 				url : HASTE_PLUS.addParametersToUri(url, {
 					multiple: <?= $this->uploadMultiple ? 1 : 0; ?>,
 					isAjaxUpload: 1,
@@ -161,7 +161,16 @@
 								.replace(/\{\{minImageHeight\}\}/, dropzone.options.minImageHeight));
 					};
 				}
-			})
+			});
+			
+			// apppend the whole form data
+			dropzone.on('sending', function(file, xhr, formData){
+				var $form = $(this.element.closest('form'));
+				formData.append('FORM_SUBMIT', $form.attr('id'));
+				$.each($form.serializeArray(), function(i, field ) {
+					formData.append(field.name, field.value);
+				})
+			});
 		});
 
 	})(jQuery)
