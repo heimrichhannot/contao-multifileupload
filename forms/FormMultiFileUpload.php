@@ -64,10 +64,20 @@ class FormMultiFileUpload extends \Upload
 		if (!\Input::get('requestToken') || !RequestToken::validate(\Input::get('requestToken')))
 			die('Invalid Request Token!');
 
+		$strUploadFolder = $this->objUploader->uploadFolder;
+		
+		if(\Validator::isUuid($strUploadFolder))
+		{
+			if(($strUploadFolder = Files::getPathFromUuid($strUploadFolder)) === null)
+			{
+				die('Invalid upload folder!');
+			}
+		}
+		
 		// create if not existing
-		new \Folder($this->objUploader->uploadFolder);
+		new \Folder($strUploadFolder);
 
-		$strUploadFolder = rtrim($this->objUploader->uploadFolder, '/');
+		$strUploadFolder = rtrim($strUploadFolder, '/');
 
 		if ($strAction && \Input::get('field') == $arrAttributes['name'])
 		{
