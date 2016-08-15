@@ -33,6 +33,13 @@
 		<div class="dropzone-previews"></div>
 	</div>
 </div>
+
+<?php if ($this->explanation): ?>
+	<div class="explanation">
+		<?= $this->explanation ?>
+	</div>
+<?php endif; ?>
+
 <?= $this->js; ?>
 
 <?php $this->endblock(); ?>
