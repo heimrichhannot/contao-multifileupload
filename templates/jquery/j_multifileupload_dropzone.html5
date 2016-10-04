@@ -163,9 +163,9 @@
 				}
 			});
 			
-			// apppend the whole form data
+			// append the whole form data
 			dropzone.on('sending', function(file, xhr, formData){
-				var $form = $(this.element.closest('form'));
+				var $form = $(this.element).closest('form');
 				formData.append('FORM_SUBMIT', $form.attr('id'));
 				$.each($form.serializeArray(), function(i, field ) {
 					formData.append(field.name, field.value);
