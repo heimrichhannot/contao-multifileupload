@@ -17,172 +17,177 @@ use HeimrichHannot\Haste\Util\StringUtil;
 
 class MultiFileUpload extends \FileUpload
 {
-	protected $arrData = array();
+    protected $arrData = array();
 
-	protected $strTemplate = 'form_multifileupload_dropzone';
-	protected $strJQueryTemplate = 'j_multifileupload_dropzone';
+    protected $strTemplate       = 'form_multifileupload_dropzone';
+    protected $strJQueryTemplate = 'j_multifileupload_dropzone';
 
-	public function __construct($arrAttributes)
-	{
-		parent::__construct();
-		$this->arrData = $arrAttributes;
+    public function __construct($arrAttributes)
+    {
+        parent::__construct();
+        $this->arrData = $arrAttributes;
 
-		$this->loadDcaConfig();
-	}
+        $this->loadDcaConfig();
+    }
 
-	protected function loadDcaConfig()
-	{
-		// in MB
-		$this->maxFilesize = ($this->maxUploadSize ?: $this->getMaximumUploadSize() / 1024 / 1024);
+    protected function loadDcaConfig()
+    {
+        // in MB
+        $this->maxFilesize = ($this->maxUploadSize ?: $this->getMaximumUploadSize() / 1024 / 1024);
 
-		$this->acceptedFiles = implode(
-			',',
-			array_map(
-				function ($a) {
-					return '.' . $a;
-				},
-				trimsplit(',', strtolower($this->extensions ?: \Config::get('uploadTypes')))
-			)
-		);
+        $this->acceptedFiles = implode(
+            ',',
+            array_map(
+                function ($a)
+                {
+                    return '.' . $a;
+                },
+                trimsplit(',', strtolower($this->extensions ?: \Config::get('uploadTypes')))
+            )
+        );
 
-		// upload folder
-		if (is_array($this->uploadFolder))
-		{
-			$arrCallback = $this->uploadFolder;
-			$this->uploadFolder = \System::importStatic($arrCallback[0])->$arrCallback[1]($this->arrData['dataContainer']);
-		}
-		elseif (is_callable($this->uploadFolder))
-		{
-			$strMethod = $this->uploadFolder;
-			$this->uploadFolder = $strMethod($this->arrData['dataContainer']);
-		}
-		else
-		{
-			if (strpos($this->uploadFolder, '../') !== false)
-			{
-				throw new \Exception("Invalid target path $this->uploadFolder");
-			} elseif (!$this->uploadFolder)
-			{
-				$this->uploadFolder = \Config::get('uploadPath');
-			}
-		}
+        // upload folder
+        if (is_array($this->uploadFolder))
+        {
+            $arrCallback        = $this->uploadFolder;
+            $this->uploadFolder = \System::importStatic($arrCallback[0])->$arrCallback[1]($this->arrData['dataContainer']);
+        }
+        elseif (is_callable($this->uploadFolder))
+        {
+            $strMethod          = $this->uploadFolder;
+            $this->uploadFolder = $strMethod($this->arrData['dataContainer']);
+        }
+        else
+        {
+            if (strpos($this->uploadFolder, '../') !== false)
+            {
+                throw new \Exception("Invalid target path $this->uploadFolder");
+            }
+            elseif (!$this->uploadFolder)
+            {
+                $this->uploadFolder = \Config::get('uploadPath');
+            }
+        }
 
-		// labels & messages
-		$this->labels = $this->labels ?: $GLOBALS['TL_LANG']['MSC']['dropzone']['labels'];
-		$this->messages = $this->messages ?: $GLOBALS['TL_LANG']['MSC']['dropzone']['messages'];
+        // labels & messages
+        $this->labels   = $this->labels ?: $GLOBALS['TL_LANG']['MSC']['dropzone']['labels'];
+        $this->messages = $this->messages ?: $GLOBALS['TL_LANG']['MSC']['dropzone']['messages'];
 
-		// image measurements
-		$this->minImageWidth = $this->minImageWidth ?: 0;
-		$this->minImageHeight = $this->minImageHeight ?: 0;
-	}
+        // image measurements
+        $this->minImageWidth  = $this->minImageWidth ?: 0;
+        $this->minImageHeight = $this->minImageHeight ?: 0;
+    }
 
-	/**
-	 * Generate the markup for the default uploader
-	 *
-	 * @return string
-	 */
-	public function generateMarkup()
-	{
-		$objT = new \FrontendTemplate($this->strTemplate);
-		$objT->setData($this->arrData);
-		$objT->id = $this->strField;
-		$objT->uploadMultiple = ($this->fieldType == 'checkbox');
-		$objT->initialFiles = json_encode($this->value ?: array());
-		$objT->initialFilesFormatted = $this->prepareValue();
-		$objT->uploadedFiles = '[]';
-		$objT->deletedFiles = '[]';
-		$objT->js = $this->generateJs();
+    /**
+     * Generate the markup for the default uploader
+     *
+     * @return string
+     */
+    public function generateMarkup()
+    {
+        $objT = new \FrontendTemplate($this->strTemplate);
+        $objT->setData($this->arrData);
+        $objT->id                    = $this->strField;
+        $objT->uploadMultiple        = ($this->fieldType == 'checkbox');
+        $objT->initialFiles          = json_encode($this->value ?: array());
+        $objT->initialFilesFormatted = $this->prepareValue();
+        $objT->uploadedFiles         = '[]';
+        $objT->deletedFiles          = '[]';
+        $objT->js                    = $this->generateJs();
 
-		return $objT->parse();
-	}
+        return $objT->parse();
+    }
 
-	protected function prepareValue() {
-		if (!empty($this->value))
-		{
-			$arrResult = array();
+    protected function prepareValue()
+    {
+        if (!empty($this->value))
+        {
+            $arrResult = array();
 
-			foreach ($this->value as $strUuid)
-			{
-				if ($arrFile = $this->prepareFile($strUuid))
-					$arrResult[] = $arrFile;
-			}
+            foreach ($this->value as $strUuid)
+            {
+                if ($arrFile = $this->prepareFile($strUuid))
+                {
+                    $arrResult[] = $arrFile;
+                }
+            }
 
-			return json_encode($arrResult);
-		}
-	}
+            return json_encode($arrResult);
+        }
+    }
 
-	protected function prepareFile($varUuid)
-	{
-		if (($objFile = Files::getFileFromUuid($varUuid, true)) !== null && $objFile->exists())
-		{
-			return array(
-				// remove timestamp from filename
-				'name' => StringUtil::preg_replace_last('@_[a-f0-9]{13}@', $objFile->name),
-				'uuid' => \StringUtil::binToUuid($objFile->getModel()->uuid),
-				'size' => $objFile->filesize
-			);
-		}
+    protected function prepareFile($varUuid)
+    {
+        if (($objFile = Files::getFileFromUuid($varUuid, true)) !== null && $objFile->exists())
+        {
+            return array(
+                // remove timestamp from filename
+                'name' => StringUtil::preg_replace_last('@_[a-f0-9]{13}@', $objFile->name),
+                'uuid' => \StringUtil::binToUuid($objFile->getModel()->uuid),
+                'size' => $objFile->filesize,
+            );
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	protected function generateJs()
-	{
-		$objT = new \FrontendTemplate($this->strJQueryTemplate);
-		$objT->setData($this->arrData);
-		$objT->id = $this->strField;
-		$objT->uploadMultiple = ($this->fieldType == 'checkbox');
+    protected function generateJs()
+    {
+        $objT = new \FrontendTemplate($this->strJQueryTemplate);
+        $objT->setData($this->arrData);
+        $objT->id             = $this->strField;
+        $objT->uploadMultiple = ($this->fieldType == 'checkbox');
 
-		return $objT->parse();
-	}
+        return $objT->parse();
+    }
 
-	/**
-	 * Set an object property
-	 *
-	 * @param string
-	 * @param mixed
-	 */
-	public function __set($strKey, $varValue)
-	{
-		$this->arrData[$strKey] = $varValue;
-	}
-
-
-	/**
-	 * Return an object property
-	 *
-	 * @param string
-	 *
-	 * @return mixed
-	 */
-	public function __get($strKey)
-	{
-		switch ($strKey)
-		{
-			case 'name':
-				return $this->strName;
-			break;
-		}
+    /**
+     * Set an object property
+     *
+     * @param string
+     * @param mixed
+     */
+    public function __set($strKey, $varValue)
+    {
+        $this->arrData[$strKey] = $varValue;
+    }
 
 
+    /**
+     * Return an object property
+     *
+     * @param string
+     *
+     * @return mixed
+     */
+    public function __get($strKey)
+    {
+        switch ($strKey)
+        {
+            case 'name':
+                return $this->strName;
+                break;
+        }
 
-		if (isset($this->arrData[$strKey])) {
-			return $this->arrData[$strKey];
-		}
 
-		return parent::__get($strKey);
-	}
+        if (isset($this->arrData[$strKey]))
+        {
+            return $this->arrData[$strKey];
+        }
+
+        return parent::__get($strKey);
+    }
 
 
-	/**
-	 * Check whether a property is set
-	 *
-	 * @param string
-	 *
-	 * @return boolean
-	 */
-	public function __isset($strKey)
-	{
-		return isset($this->arrData[$strKey]);
-	}
+    /**
+     * Check whether a property is set
+     *
+     * @param string
+     *
+     * @return boolean
+     */
+    public function __isset($strKey)
+    {
+        return isset($this->arrData[$strKey]);
+    }
 }

@@ -15,9 +15,9 @@
 $GLOBALS['TL_FFL']['multifileupload'] = 'HeimrichHannot\\MultiFileUpload\\FormMultiFileUpload';
 $GLOBALS['BE_FFL']['multifileupload'] = 'FileTree';
 
-if(TL_MODE == 'FE')
+if (TL_MODE == 'FE')
 {
-	// Add the scripts
-	$GLOBALS['TL_CSS']['dropzone'] = 'assets/dropzone/' . $GLOBALS['TL_ASSETS']['DROPZONE'] . '/css/dropzone.min.css';
-	$GLOBALS['TL_JAVASCRIPT']['dropzone'] = 'assets/dropzone/' . $GLOBALS['TL_ASSETS']['DROPZONE'] . '/js/dropzone.js';
+    // Add the scripts
+    $GLOBALS['TL_CSS']['dropzone']        = 'assets/dropzone/' . $GLOBALS['TL_ASSETS']['DROPZONE'] . '/css/dropzone.min.css';
+    $GLOBALS['TL_JAVASCRIPT']['dropzone'] = 'assets/dropzone/' . $GLOBALS['TL_ASSETS']['DROPZONE'] . '/js/dropzone.js';
 }
