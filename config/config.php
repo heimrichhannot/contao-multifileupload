@@ -4,20 +4,51 @@
  *
  * Copyright (c) 2015 Heimrich & Hannot GmbH
  *
- * @package dropzone
+ * @package multifileupload
  * @author  Rico Kaltofen <r.kaltofen@heimrich-hannot.de>
  * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
  */
 
+
+/**
+ *  Default config
+ */
+$GLOBALS['TL_CONFIG']['enableMultiFileUploadFrontendStyles'] = true;
+
 /**
  * Front end form fields
  */
-$GLOBALS['TL_FFL']['multifileupload'] = 'HeimrichHannot\\MultiFileUpload\\FormMultiFileUpload';
-$GLOBALS['BE_FFL']['multifileupload'] = 'FileTree';
+$GLOBALS['TL_FFL']['multifileupload'] = 'HeimrichHannot\MultiFileUpload\FormMultiFileUpload';
+$GLOBALS['BE_FFL']['multifileupload'] = 'HeimrichHannot\MultiFileUpload\Widget\BackendMultiFileUpload';
 
-if (TL_MODE == 'FE')
+/**
+ * Hooks
+ */
+$GLOBALS['TL_HOOKS']['executePostActions']['multifileupload'] = array('HeimrichHannot\MultiFileUpload\Widget\BackendMultiFileUpload', 'executePostActionsHook');
+
+/**
+ * Ajax action
+ */
+$GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = array(
+    'actions' => array(
+        \HeimrichHannot\MultiFileUpload\MultiFileUpload::ACTION_UPLOAD => array(
+            'arguments' => array(),
+            'optional'  => array(),
+        ),
+    ),
+);
+
+/**
+ * Assets (add dropzone not within contao files manager)
+ */
+//
+if (!(TL_MODE == 'BE' && \Input::get('do') == 'files'))
 {
-    // Add the scripts
-    $GLOBALS['TL_CSS']['dropzone']        = 'assets/dropzone/' . $GLOBALS['TL_ASSETS']['DROPZONE'] . '/css/dropzone.min.css';
-    $GLOBALS['TL_JAVASCRIPT']['dropzone'] = 'assets/dropzone/' . $GLOBALS['TL_ASSETS']['DROPZONE'] . '/js/dropzone.js';
+    if(\Config::get('enableMultiFileUploadFrontendStyles'))
+    {
+        $GLOBALS['TL_CSS']['dropzone']               = 'system/modules/multifileupload/assets/css/dropzone.css';
+    }
+
+    $GLOBALS['TL_JAVASCRIPT']['dropzone']        = 'composer/vendor/enyo/dropzone/dist/min/dropzone.min.js';
+    $GLOBALS['TL_JAVASCRIPT']['multifileupload'] = 'system/modules/multifileupload/assets/js/multifileupload.min.js';
 }

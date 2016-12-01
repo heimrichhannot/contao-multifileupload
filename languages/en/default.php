@@ -20,3 +20,13 @@ $GLOBALS['TL_LANG']['MSC']['dropzone']['messages'] = array(
     'dictRemoveFileConfirmation'   => null,
     'dictMaxFilesExceeded'         => 'You can not upload any more files.',
 );
+
+$GLOBALS['TL_LANG']['ERR']['invalidUuid'] = 'No unique identifier (uuid) has been assigned to the file, please try to upload the file again.';
+$GLOBALS['TL_LANG']['ERR']['moveUploadFile'] = 'Invalid file or error on moving files, check permissions or upload destination.';
+$GLOBALS['TL_LANG']['ERR']['outsideUploadDirectory'] = 'Upload destination lies outside the contao upload directory.';
+$GLOBALS['TL_LANG']['ERR']['uploadNoUploadFolderDeclared'] = 'Kein gültiger "uploadFolder" für das Feld "%s" in eval angegeben, die Dateien wurden aus dem Verzeichnis "%s" nicht verschoben.';
+$GLOBALS['TL_LANG']['ERR']['noUploadFolderDeclared'] = 'Kein "uploadFolder" für das Feld "%s" in eval angegeben.';
+$GLOBALS['TL_LANG']['ERR']['minWidth'] = 'The width of the image must not be less than %s pixel (image width: %s pixel).';
+$GLOBALS['TL_LANG']['ERR']['minHeight'] = 'The height of the image must not be less than %s pixel (image width: %s pixel).';
+$GLOBALS['TL_LANG']['ERR']['maxWidth'] = 'The width of the image must not exceed %s pixel (image width: %s pixel).';
+$GLOBALS['TL_LANG']['ERR']['maxHeight'] = 'The height of the image must not exceed %s pixel (image width: %s pixel).';

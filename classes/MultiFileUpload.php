@@ -5,15 +5,17 @@
  *
  * Copyright (c) 2015 Heimrich & Hannot GmbH
  *
- * @package dropzone
+ * @package multifileupload
  * @author  Rico Kaltofen <r.kaltofen@heimrich-hannot.de>
  * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
  */
 
 namespace HeimrichHannot\MultiFileUpload;
 
+use HeimrichHannot\Haste\Util\Environment;
 use HeimrichHannot\Haste\Util\Files;
 use HeimrichHannot\Haste\Util\StringUtil;
+use HeimrichHannot\Haste\Util\Url;
 
 class MultiFileUpload extends \FileUpload
 {
@@ -22,10 +24,45 @@ class MultiFileUpload extends \FileUpload
     protected $strTemplate       = 'form_multifileupload_dropzone';
     protected $strJQueryTemplate = 'j_multifileupload_dropzone';
 
+    const NAME                  = 'multifileupload';
+    const ACTION_UPLOAD         = 'upload';
+    const ACTION_UPLOAD_BACKEND = 'multifileupload_upload';
+
+    const MIME_THEME_DEFAULT = 'system/modules/multifileupload/assets/img/mimetypes/Numix-uTouch';
+    const UPLOAD_TMP = 'files/tmp';
+
+    const SESSION_ALLOWED_DOWNLOADS = 'multifileupload_allowed_downloads';
+
+    /**
+     * Has current page in xhtml type.
+     *
+     * @var bool
+     */
+
+    protected $blnIsXhtml = false;
+
     public function __construct($arrAttributes)
     {
         parent::__construct();
         $this->arrData = $arrAttributes;
+
+        $file = \Input::get('file', true);
+
+        // Send the file to the browser
+        if ($file != '')
+        {
+            if(!static::isAllowedDownload($file))
+            {
+                header('HTTP/1.1 403 Forbidden');
+                die('No file access.');
+            }
+
+            \Controller::sendFileToBrowser($file);
+        }
+
+        global $objPage;
+
+        $this->blnIsXhtml = ($objPage->outputFormat == 'xhtml');
 
         $this->loadDcaConfig();
     }
@@ -46,36 +83,31 @@ class MultiFileUpload extends \FileUpload
             )
         );
 
-        // upload folder
-        if (is_array($this->uploadFolder))
-        {
-            $arrCallback        = $this->uploadFolder;
-            $this->uploadFolder = \System::importStatic($arrCallback[0])->$arrCallback[1]($this->arrData['dataContainer']);
-        }
-        elseif (is_callable($this->uploadFolder))
-        {
-            $strMethod          = $this->uploadFolder;
-            $this->uploadFolder = $strMethod($this->arrData['dataContainer']);
-        }
-        else
-        {
-            if (strpos($this->uploadFolder, '../') !== false)
-            {
-                throw new \Exception("Invalid target path $this->uploadFolder");
-            }
-            elseif (!$this->uploadFolder)
-            {
-                $this->uploadFolder = \Config::get('uploadPath');
-            }
-        }
-
         // labels & messages
         $this->labels   = $this->labels ?: $GLOBALS['TL_LANG']['MSC']['dropzone']['labels'];
         $this->messages = $this->messages ?: $GLOBALS['TL_LANG']['MSC']['dropzone']['messages'];
 
-        // image measurements
-        $this->minImageWidth  = $this->minImageWidth ?: 0;
-        $this->minImageHeight = $this->minImageHeight ?: 0;
+        foreach ($this->messages as $strKey => $strMessage)
+        {
+            $this->{$strKey} = $strMessage;
+        }
+
+        foreach ($this->labels as $strKey => $strMessage)
+        {
+            $this->{$strKey} = $strMessage;
+        }
+
+        $this->thumbnailWidth = $this->thumbnailWidth ?: 90;
+        $this->thumbnailHeight = $this->thumbnailHeight ?: 90;
+
+        $this->createImageThumbnails = $this->createImageThumbnails ?: true;
+
+        $this->requestToken = \RequestToken::get();
+
+        $this->previewsContainer = '#ctrl_' . $this->id . ' .dropzone-previews';
+
+        $this->uploadMultiple = ($this->fieldType == 'checkbox');
+        $this->maxFiles       = ($this->uploadMultiple ? ($this->maxFiles ?: null) : 1);
     }
 
     /**
@@ -85,17 +117,141 @@ class MultiFileUpload extends \FileUpload
      */
     public function generateMarkup()
     {
+        $arrValues = array_values($this->value ?: array());
+
         $objT = new \FrontendTemplate($this->strTemplate);
         $objT->setData($this->arrData);
         $objT->id                    = $this->strField;
-        $objT->uploadMultiple        = ($this->fieldType == 'checkbox');
-        $objT->initialFiles          = json_encode($this->value ?: array());
+        $objT->uploadMultiple        = $this->uploadMultiple;
+        $objT->initialFiles          = json_encode($arrValues);
         $objT->initialFilesFormatted = $this->prepareValue();
         $objT->uploadedFiles         = '[]';
         $objT->deletedFiles          = '[]';
-        $objT->js                    = $this->generateJs();
+        $objT->attributes            = $this->getAttributes($this->getDropZoneOptions());
 
         return $objT->parse();
+    }
+
+    /**
+     * Return data attributes in correct syntax, considering doc type
+     *
+     * @param array $arrAttributes
+     *
+     * @return string
+     */
+    protected function getAttributes(array $arrAttributes = array())
+    {
+        $arrOptions = array();
+
+        foreach ($arrAttributes as $strKey => $varValue)
+        {
+            $arrOptions[] = $this->getAttribute($strKey, $varValue);
+        }
+
+        return implode(' ', $arrOptions);
+    }
+
+    /**
+     * Return html attribute in correct syntax, considering doc type
+     *
+     * @param string $strKey
+     * @param        $varValue
+     *
+     * @return string
+     */
+    protected function getAttribute($strKey, $varValue)
+    {
+        if ($strKey == 'disabled' || $strKey == 'readonly' || $strKey == 'required' || $strKey == 'autofocus' || $strKey == 'multiple')
+        {
+            $varValue = $strKey;
+
+            return $this->blnIsXhtml ? ' ' . $strKey . '="' . $varValue . '"' : ' ' . $strKey;
+        }
+        else
+        {
+            return ' ' . $strKey . '="' . $varValue . '"';
+        }
+
+        return '';
+    }
+
+    /**
+     * Get all dropzone related options
+     *
+     * @return string
+     */
+    protected function getDropZoneOptions()
+    {
+        $arrOptions = array();
+
+        foreach (array_keys($this->arrData) as $strKey)
+        {
+            if (($varValue = $this->getDropZoneOption($strKey)) === null)
+            {
+                continue;
+            }
+
+            // convert camelCase to hyphen, jquery.data() will make camelCase from hyphen again
+            $strKey = 'data-' . strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $strKey));
+
+            $arrOptions[$strKey] = $varValue;
+        }
+
+        return $arrOptions;
+    }
+
+    /**
+     * Get a single dropzone option
+     *
+     * @param        $strKey
+     *
+     * @return string
+     */
+    public function getDropZoneOption(&$strKey)
+    {
+        $varValue = null;
+
+        switch ($strKey)
+        {
+            case 'url':
+            case 'uploadAction':
+            case 'uploadActionParams':
+            case 'method':
+            case 'withCredentials':
+            case 'parallelUploads':
+            case 'maxFiles':
+            case 'uploadMultiple':
+            case 'maxFilesize':
+            case 'requestToken':
+            case 'acceptedFiles':
+            case 'addRemoveLinks':
+            case 'thumbnailWidth':
+            case 'thumbnailHeight':
+            case 'previewsContainer':
+                $varValue = $this->arrData[$strKey];
+                break;
+            case 'createImageThumbnails':
+                $varValue = ($this->thumbnailWidth || $this->thumbnailHeight && $this->arrData[$strKey]) ? 'true' : 'false';
+                break;
+            case 'name':
+                $varValue = $this->arrData[$strKey];
+                $strKey   = 'paramName';
+                break;
+            case 'dictDefaultMessage':
+            case 'dictFallbackMessage':
+            case 'dictFallbackText':
+            case 'dictInvalidFileType':
+            case 'dictFileTooBig':
+            case 'dictResponseError':
+            case 'dictCancelUpload':
+            case 'dictCancelUploadConfirmation':
+            case 'dictRemoveFile':
+            case 'dictMaxFilesExceeded':
+                $varValue = is_array($this->arrData[$strKey]) ? reset($this->arrData[$strKey]) : $this->arrData[$strKey];
+                break;
+        }
+
+        return $varValue;
     }
 
     protected function prepareValue()
@@ -116,29 +272,134 @@ class MultiFileUpload extends \FileUpload
         }
     }
 
-    protected function prepareFile($varUuid)
+    public function prepareFile($varUuid)
     {
         if (($objFile = Files::getFileFromUuid($varUuid, true)) !== null && $objFile->exists())
         {
-            return array(
+            static::addAllowedDownload($objFile->value);
+
+            $arrReturn = array(
                 // remove timestamp from filename
                 'name' => StringUtil::preg_replace_last('@_[a-f0-9]{13}@', $objFile->name),
                 'uuid' => \StringUtil::binToUuid($objFile->getModel()->uuid),
-                'size' => $objFile->filesize,
+                'size' => $objFile->filesize
             );
+
+            if (($strImage = $this->getPreviewImage($objFile)) !== null)
+            {
+                $arrReturn['url'] = $strImage;
+            }
+
+            if (($strInfoUrl = $this->getInfoAction($objFile)) !== null)
+            {
+                $arrReturn['info'] = $strInfoUrl;
+            }
+
+            return $arrReturn;
         }
 
         return false;
     }
 
-    protected function generateJs()
+    protected function getInfoAction(\File $objFile)
     {
-        $objT = new \FrontendTemplate($this->strJQueryTemplate);
-        $objT->setData($this->arrData);
-        $objT->id             = $this->strField;
-        $objT->uploadMultiple = ($this->fieldType == 'checkbox');
+        $strUrl             = null;
+        $strFileNameEncoded = utf8_convert_encoding($objFile->name, \Config::get('characterSet'));
 
-        return $objT->parse();
+        switch (TL_MODE)
+        {
+            case 'FE':
+
+                $strHref = Url::getCurrentUrlWithoutParameters();
+                $strHref .= ((\Config::get('disableAlias') || strpos($strHref, '?') !== false) ? '&amp;' : '?') . 'file=' . \System::urlEncode($objFile->value);
+                return 'window.open("' . $strHref . '", "_blank");';
+
+                break;
+            case 'BE':
+                if (\Input::get('popup'))
+                {
+                    return null;
+                }
+                else
+                {
+                    $popupWidth  = 664;
+                    $popupHeight = 299;
+                    $href        = 'contao/popup.php?src=' . base64_encode($objFile->value);
+
+                    return 'Backend.openModalIframe({"width":"' . $popupWidth . '","title":"' . str_replace(
+                        "'",
+                        "\\'",
+                        specialchars($strFileNameEncoded, false, true)
+                    ) . '","url":"' . $href . '","height":"' . $popupHeight . '"});return false';
+                }
+                break;
+        }
+
+        return $strUrl;
+    }
+
+    public static function addAllowedDownload($strFile)
+    {
+        $arrDownloads = \Session::getInstance()->get(static::SESSION_ALLOWED_DOWNLOADS);
+
+        if(!is_array($arrDownloads))
+        {
+            $arrDownloads = array();
+        }
+
+        $arrDownloads[] = $strFile;
+
+        $arrDownloads = array_filter($arrDownloads);
+
+        \Session::getInstance()->set(static::SESSION_ALLOWED_DOWNLOADS, $arrDownloads);
+    }
+
+    public static function isAllowedDownload($strFile)
+    {
+        $arrDownloads = \Session::getInstance()->get(static::SESSION_ALLOWED_DOWNLOADS);
+
+        if(!is_array($arrDownloads))
+        {
+            return false;
+        }
+
+        if(array_search($strFile, $arrDownloads) !== false)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function getPreviewImage(\File $objFile)
+    {
+        if ($objFile->isImage)
+        {
+            return $objFile->path;
+        }
+
+        $themeFolder = rtrim($this->mimeFolder ?: static::MIME_THEME_DEFAULT, '/');
+
+        if (!file_exists(TL_ROOT . '/' . $themeFolder . '/mimetypes.json'))
+        {
+            return null;
+        }
+
+        $objMimeFile = new \File($themeFolder . '/mimetypes.json');
+
+        $objMines = json_decode($objMimeFile->getContent());
+
+        if (!$objMines->{$objFile->extension})
+        {
+            return null;
+        }
+
+        if (!file_exists(TL_ROOT . '/' . $themeFolder . '/' . $objMines->{$objFile->extension}))
+        {
+            return null;
+        }
+
+        return $themeFolder . '/' . $objMines->{$objFile->extension};
     }
 
     /**
