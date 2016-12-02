@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2016-12-02
+
+### Changed
+- improved styling and added 'dz-has-files' class to dropzone container if files are within the box
+
 ## [1.1.0] - 2016-12-02
 
 ### Changed

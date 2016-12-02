@@ -57,10 +57,15 @@
                                 arrDeleted.push(file.uuid);
                                 deleted.value = JSON.stringify(arrDeleted);
                             }
+
+                            // remove dz-has-files css class
+                            if (this.files.length < 1) {
+                                this.element.classList.remove('dz-has-files');
+                            }
                         }
+
                     }).on('success', function (file, response) {
-                        if(typeof response.result == 'undefined')
-                        {
+                        if (typeof response.result == 'undefined') {
                             dropzone.emit("error", file, dropzone.options.dictResponseError.replace("{{statusCode}}", ': Empty response'), response);
                             return;
                         }
@@ -80,7 +85,7 @@
                                 if ((objHandler = handleResponse(file, response[i])) !== false) {
                                     file = objHandler;
                                     persistFile(file, uploaded, filesToSave);
-                                    if(file.url){
+                                    if (file.url) {
                                         dropzone.createThumbnailFromUrl(file, file.url);
                                     }
                                     __registerOnClick(file, file.info);
@@ -92,7 +97,7 @@
                             if ((objHandler = handleResponse(file, response)) !== false) {
                                 file = objHandler;
                                 persistFile(file, uploaded, filesToSave);
-                                if(file.url){
+                                if (file.url) {
                                     dropzone.createThumbnailFromUrl(file, file.url);
                                 }
                                 __registerOnClick(file, file.info);
@@ -138,13 +143,12 @@
 
                             return false;
                         }
-                    }).on('error', function(file, message, xhr){
+                    }).on('error', function (file, message, xhr) {
 
                         // remove dz-error-show from other preview elements
                         var siblings = file.previewElement.parentNode.querySelectorAll('.dz-error-show');
 
-                        if(siblings)
-                        {
+                        if (siblings) {
                             for (var i = 0, len = siblings.length; i < len; i++) {
                                 var sibling = siblings[i];
                                 sibling.classList.remove('dz-error-show');
@@ -154,7 +158,7 @@
                         file.previewElement.classList.remove("dz-success");
                         file.previewElement.classList.add("dz-error-show");
 
-                        file.previewElement.addEventListener("mouseleave", function(){
+                        file.previewElement.addEventListener("mouseleave", function () {
                             this.classList.remove('dz-error-show');
                         });
                     }).on('sending', function (file, xhr, formData) {
@@ -173,6 +177,10 @@
                             var input = inputs[i];
                             formData.append(input.name, input.value);
                         }
+                    }).on('addedfile', function (file) {
+                        if(this.files.length > 0){
+                            this.element.classList.add('dz-has-files');
+                        }
                     });
 
                     // add mock files
@@ -188,11 +196,15 @@
 
                             this.files.push(mock);
                             this.emit('addedfile', mock);
-                            if(mock.url){
+                            if (mock.url) {
                                 this.createThumbnailFromUrl(mock, mock.url);
                             }
                             __registerOnClick(mock, mock.info);
                             this.emit('complete', mock);
+                        }
+
+                        if (this.files.length > 0) {
+                            this.element.classList.add('dz-has-files');
                         }
                     }
                 }
