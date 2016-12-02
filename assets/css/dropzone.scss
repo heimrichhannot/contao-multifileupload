@@ -97,8 +97,9 @@
 
 .dropzone {
 
+  $red: rgb(190, 38, 38);
   $preview-container-background: #f1f1f1;
-  $remove-hover-background: #bd2c00;
+  $remove-hover-background: $red;
   $hover-background: #eee;
   $border-color: #ccc;
   $image-size: 90px;
@@ -205,6 +206,8 @@
       border: none;
       border-top: 1px solid $border-color;
       padding: 2px 0;
+      background-color: transparent;
+      @include prefix((transition: background 0.3s linear));
 
       &:hover {
         background-color: $remove-hover-background;
@@ -290,6 +293,8 @@
       position: relative;
       display: block;
       z-index: 10;
+      @include prefix((transition: opacity 0.3s linear));
+      background-color: transparent;
 
       img {
         display: block;
@@ -388,6 +393,7 @@
       .dz-error-message {
         display: block;
       }
+      &.dz-error-show  .dz-error-message,
       &:hover .dz-error-message {
         opacity: 1;
         pointer-events: auto;
@@ -395,8 +401,8 @@
     }
 
     .dz-error-message {
-      $width: $image-size + 20px;
-      $color: rgb(190, 38, 38);
+      $width: $image-size + 120px;
+      $color: $red;
 
       pointer-events: none;
       z-index: 1000;
@@ -420,7 +426,7 @@
         content: '';
         position: absolute;
         top: -6px;
-        left: $width / 2 - 6px;
+        left: ($image-size + 90px) / 6;
         width: 0;
         height: 0;
         border-left: 6px solid transparent;

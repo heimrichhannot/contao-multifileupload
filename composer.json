@@ -26,7 +26,8 @@
   "require": {
     "contao/core": ">=3.3,<4-dev",
     "contao-community-alliance/composer-installer": "*",
-    "heimrichhannot/contao-haste_plus": "^1.5.2",
+    "heimrichhannot/contao-haste_plus": "^1.5.5",
+    "heimrichhannot/contao-ajax": "~1.0",
     "enyo/dropzone": "^4.3"
   },
   "autoload": {

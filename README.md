@@ -48,7 +48,7 @@ Name | Default | Description
 ---- | ------- | -----------
 fieldType | 'checkbox' | If set to "checkbox", multiple files can be uploaded, for single upload set to 'radio'
 extensions | \Config::get('uploadTypes') | A comma separated list of allowed file types (e.g. "jpg,png")
-maxUploadSize | php.ini value "upload_max_filesize" in MB | The desired maximum upload size measured in MB
+maxUploadSize | $GLOBALS['TL_CONFIG']['maxFileSize'] or php.ini 'upload_max_filesize' | The desired maximum upload size measured in Bytes, KiB, MiB, GiB, can not exceed $GLOBALS['TL_CONFIG']['maxFileSize'] or php upload_max_filesize value. 
 maxFiles | infinite | The maximum file count per field
 uploadFolder | null | The upload folder as String, e.g. "files/uploads", function or array. **(must be declared !!!)**, required to move files to correct destination after submission.
 addRemoveLinks | true | Remove links are added to each of the file avatars in the jquery (caption can be overwritten within language files)
@@ -56,11 +56,17 @@ minImageWidth | 0 | The minimum image width. Set to 0 for no min width image val
 minImageHeight | 0 | The minimum image height. Set to 0 for no min height image validation. All units from \Image::getPixelValue() are supported.
 maxImageWidth | 0 | The maximum image width. Set to 0 for no max width image validation. All units from \Image::getPixelValue() are supported.
 maxImageHeight | 0 | The maximum image height. Set to 0 for no max image height validation. All units from \Image::getPixelValue() are supported.
+minImageWidthErrorText | $GLOBALS['TL_LANG']['ERR']['minWidth'] | Custom error message for minimum image width. (arguments provided: 1 - minimum width from config, 2 - current image width)
+minImageHeightErrorText | $GLOBALS['TL_LANG']['ERR']['minHeight'] | Custom error message for minimum image height. (arguments provided: 1 - minimum height from config, 2 - current image height)
+maxImageWidthErrorText | $GLOBALS['TL_LANG']['ERR']['maxWidth'] | Custom error message for maximum image width. (arguments provided: 1 - maximum width from config, 2 - current image width)
+maxImageHeightErrorText | $GLOBALS['TL_LANG']['ERR']['maxHeight'] | Custom error message for maximum image height. (arguments provided: 1 - maximum height from config, 2 - current image height)
 createImageThumbnails | boolean(true) | Set to false if you dont want to preview thumbnails.
+mimeFolder | system/modules/multifileupload/assets/img/mimetypes/Numix-uTouch | The relative path from contao root to custom mimetype folder, mimetypes.json and images must lie inside. (example: system/modules/multifileupload/assets/img/mimetypes/Numix-uTouch)
+mimeThumbnailsOnly | boolean(false) | Set to true if you want to show mime image thumbnails only, and no image preview at all. (performance improvement)
 thumbnailWidth | 90 | The thumbnail width (in px) of the uploaded file preview within the dropzone preview container.
 thumbnailHeight | 90 | The thumbnail height (in px) of the uploaded file preview within the dropzone preview container.
 labels | array() | Overwrite the head and body labels within the upload field.
-mimeFolder | system/modules/multifileupload/assets/img/mimetypes/Numix-uTouch | The relative path from contao root to custom mimetype folder, mimetypes.json and images must lie inside. (example: system/modules/multifileupload/assets/img/mimetypes/Numix-uTouch)
+
 
 ### Field Callbacks
 

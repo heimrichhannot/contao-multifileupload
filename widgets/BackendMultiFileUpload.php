@@ -41,19 +41,15 @@ class BackendMultiFileUpload extends FormMultiFileUpload
             $objResponse->output();
         }
 
-        $this->name = \Input::post('field');
-        $this->id = \Input::post('field');
-        $this->field = \Input::post('field');
-
         if($dc->activeRecord === null)
         {
             $dc->activeRecord = General::getModelInstance($dc->table, $dc->id);
         }
 
-        // add dca attributes
-        $this->addAttributes(\Widget::getAttributesFromDca($GLOBALS['TL_DCA'][$dc->table]['fields'][$this->name], $this->name));
-
-        $objResponse = $this->upload();
+        // add dca attributes and instantiate current object to set widget attributes
+        $arrAttributes = \Widget::getAttributesFromDca($GLOBALS['TL_DCA'][$dc->table]['fields'][\Input::post('field')], \Input::post('field'));
+        $objUploader = new static($arrAttributes);
+        $objResponse = $objUploader->upload();
 
         /** @var Response */
         if($objResponse instanceof Response)

@@ -59,7 +59,13 @@
                             }
                         }
                     }).on('success', function (file, response) {
-                        // each file
+                        if(typeof response.result == 'undefined')
+                        {
+                            dropzone.emit("error", file, dropzone.options.dictResponseError.replace("{{statusCode}}", ': Empty response'), response);
+                            return;
+                        }
+
+                        // each file is handled here
                         response = response.result.data;
 
                         if (response.result == 'undefined') {
@@ -118,10 +124,7 @@
 
                         function handleResponse(file, response) {
                             if (response.error) {
-                                file.previewElement.classList.remove("dz-success");
-                                file.previewElement.classList.add("dz-error");
-                                var errorEl = file.previewElement.querySelectorAll('.dz-error-message')[0];
-                                errorEl.innerText = response.error;
+                                dropzone.emit("error", file, response.error, response);
                                 return false;
                             }
 
@@ -135,6 +138,25 @@
 
                             return false;
                         }
+                    }).on('error', function(file, message, xhr){
+
+                        // remove dz-error-show from other preview elements
+                        var siblings = file.previewElement.parentNode.querySelectorAll('.dz-error-show');
+
+                        if(siblings)
+                        {
+                            for (var i = 0, len = siblings.length; i < len; i++) {
+                                var sibling = siblings[i];
+                                sibling.classList.remove('dz-error-show');
+                            }
+                        }
+
+                        file.previewElement.classList.remove("dz-success");
+                        file.previewElement.classList.add("dz-error-show");
+
+                        file.previewElement.addEventListener("mouseleave", function(){
+                            this.classList.remove('dz-error-show');
+                        });
                     }).on('sending', function (file, xhr, formData) {
                         // append the whole form data
 

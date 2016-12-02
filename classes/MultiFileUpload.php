@@ -29,7 +29,7 @@ class MultiFileUpload extends \FileUpload
     const ACTION_UPLOAD_BACKEND = 'multifileupload_upload';
 
     const MIME_THEME_DEFAULT = 'system/modules/multifileupload/assets/img/mimetypes/Numix-uTouch';
-    const UPLOAD_TMP = 'files/tmp';
+    const UPLOAD_TMP         = 'files/tmp';
 
     const SESSION_ALLOWED_DOWNLOADS = 'multifileupload_allowed_downloads';
 
@@ -51,7 +51,7 @@ class MultiFileUpload extends \FileUpload
         // Send the file to the browser
         if ($file != '')
         {
-            if(!static::isAllowedDownload($file))
+            if (!static::isAllowedDownload($file))
             {
                 header('HTTP/1.1 403 Forbidden');
                 die('No file access.');
@@ -67,10 +67,43 @@ class MultiFileUpload extends \FileUpload
         $this->loadDcaConfig();
     }
 
+    protected function getByteSize($size)
+    {
+        // Convert the value to bytes
+        if (stripos($size, 'K') !== false)
+        {
+            $size = round($size * 1024);
+        }
+        elseif (stripos($size, 'M') !== false)
+        {
+            $size = round($size * 1024 * 1024);
+        }
+        elseif (stripos($size, 'G') !== false)
+        {
+            $size = round($size * 1024 * 1024 * 1024);
+        }
+
+        return $size;
+    }
+
+    /**
+     * Get maximum file size in bytes
+     * @param null $maxUploadSize
+     *
+     * @return mixed
+     */
+    protected function getMaximumUploadSize($maxUploadSize = null)
+    {
+        // Get the upload_max_filesize from the php.ini
+        $upload_max_filesize = $this->getByteSize($maxUploadSize ?: ini_get('upload_max_filesize'));
+
+        return min($upload_max_filesize, $this->getByteSize(\Config::get('maxFileSize')), $this->getByteSize(ini_get('upload_max_filesize')));
+    }
+
     protected function loadDcaConfig()
     {
-        // in MB
-        $this->maxFilesize = ($this->maxUploadSize ?: $this->getMaximumUploadSize() / 1024 / 1024);
+        // in MiB
+        $this->maxFilesize = round(($this->getMaximumUploadSize($this->maxUploadSize) / 1024 / 1024), 2);
 
         $this->acceptedFiles = implode(
             ',',
@@ -97,7 +130,7 @@ class MultiFileUpload extends \FileUpload
             $this->{$strKey} = $strMessage;
         }
 
-        $this->thumbnailWidth = $this->thumbnailWidth ?: 90;
+        $this->thumbnailWidth  = $this->thumbnailWidth ?: 90;
         $this->thumbnailHeight = $this->thumbnailHeight ?: 90;
 
         $this->createImageThumbnails = $this->createImageThumbnails ?: true;
@@ -282,7 +315,7 @@ class MultiFileUpload extends \FileUpload
                 // remove timestamp from filename
                 'name' => StringUtil::preg_replace_last('@_[a-f0-9]{13}@', $objFile->name),
                 'uuid' => \StringUtil::binToUuid($objFile->getModel()->uuid),
-                'size' => $objFile->filesize
+                'size' => $objFile->filesize,
             );
 
             if (($strImage = $this->getPreviewImage($objFile)) !== null)
@@ -312,6 +345,7 @@ class MultiFileUpload extends \FileUpload
 
                 $strHref = Url::getCurrentUrlWithoutParameters();
                 $strHref .= ((\Config::get('disableAlias') || strpos($strHref, '?') !== false) ? '&amp;' : '?') . 'file=' . \System::urlEncode($objFile->value);
+
                 return 'window.open("' . $strHref . '", "_blank");';
 
                 break;
@@ -342,7 +376,7 @@ class MultiFileUpload extends \FileUpload
     {
         $arrDownloads = \Session::getInstance()->get(static::SESSION_ALLOWED_DOWNLOADS);
 
-        if(!is_array($arrDownloads))
+        if (!is_array($arrDownloads))
         {
             $arrDownloads = array();
         }
@@ -358,12 +392,12 @@ class MultiFileUpload extends \FileUpload
     {
         $arrDownloads = \Session::getInstance()->get(static::SESSION_ALLOWED_DOWNLOADS);
 
-        if(!is_array($arrDownloads))
+        if (!is_array($arrDownloads))
         {
             return false;
         }
 
-        if(array_search($strFile, $arrDownloads) !== false)
+        if (array_search($strFile, $arrDownloads) !== false)
         {
             return true;
         }
@@ -373,7 +407,7 @@ class MultiFileUpload extends \FileUpload
 
     protected function getPreviewImage(\File $objFile)
     {
-        if ($objFile->isImage)
+        if ($objFile->isImage && !$this->mimeThumbnailsOnly)
         {
             return $objFile->path;
         }

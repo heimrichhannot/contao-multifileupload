@@ -35,6 +35,8 @@ class FormMultiFileUpload extends \Upload
 
     protected static $uploadAction = 'upload';
 
+    const UNIQID_PREFIX = 'mfuid';
+
     public function __construct($arrAttributes = null)
     {
         // check against arrAttributes, as 'onsubmit_callback' => 'multifileupload_moveFiles' does not provide valid attributes
@@ -137,8 +139,7 @@ class FormMultiFileUpload extends \Upload
             foreach ($arrPaths as $strPath)
             {
                 $objFile   = new \File($strPath);
-                $strName   = $objFile->name;
-                $strTarget = $strUploadFolder . '/' . $strName;
+                $strTarget = $strTarget = $strUploadFolder . '/' . $objFile->name;
 
                 // upload_path_callback
                 if (is_array($arrData['upload_path_callback']))
@@ -154,6 +155,7 @@ class FormMultiFileUpload extends \Upload
                     continue;
                 }
 
+                $strTarget = Files::getUniqueFileNameWithinTarget($strTarget, static::UNIQID_PREFIX);
 
                 if ($objFile->renameTo($strTarget))
                 {
@@ -359,22 +361,22 @@ class FormMultiFileUpload extends \Upload
 
             if($minWidth > 0 && $objFile->width < $minWidth)
             {
-                return sprintf($GLOBALS['TL_LANG']['ERR']['minWidth'], $minWidth, $objFile->width);
+                return sprintf($this->minImageWidthErrorText ? : $GLOBALS['TL_LANG']['ERR']['minWidth'], $minWidth, $objFile->width);
             }
 
             if($minHeight > 0 && $objFile->height < $minHeight)
             {
-                return sprintf($GLOBALS['TL_LANG']['ERR']['minHeight'], $minHeight, $objFile->height);
+                return sprintf($this->minImageHeightErrorText ? : $GLOBALS['TL_LANG']['ERR']['minHeight'], $minHeight, $objFile->height);
             }
 
             if($maxWidth > 0 && $objFile->width > $maxWidth)
             {
-                return sprintf($GLOBALS['TL_LANG']['ERR']['maxWidth'], $maxWidth, $objFile->width);
+                return sprintf($this->maxImageWidthErrorText ? : $GLOBALS['TL_LANG']['ERR']['maxWidth'], $maxWidth, $objFile->width);
             }
 
             if($maxHeight > 0 && $objFile->height > $maxHeight)
             {
-                return sprintf($GLOBALS['TL_LANG']['ERR']['maxHeight'], $maxHeight, $objFile->height);
+                return sprintf($this->maxImageHeightErrorText ? : $GLOBALS['TL_LANG']['ERR']['maxHeight'], $maxHeight, $objFile->height);
             }
         }
 
@@ -400,7 +402,7 @@ class FormMultiFileUpload extends \Upload
 
             $arrPath = pathinfo($arrFile['name']);
 
-            $strTargetFileName = standardize($arrPath['filename']) . '_' . uniqid() . '.' . strtolower($arrPath['extension']);
+            $strTargetFileName = Files::addUniqIdToFilename(Files::sanitizeFileName($arrFile['name']), static::UNIQID_PREFIX);
             $strTargetFile     = $strUploadFolder . '/' . $strTargetFileName;
 
             if (!move_uploaded_file($strTempFile, TL_ROOT . '/' . $strTargetFile))
