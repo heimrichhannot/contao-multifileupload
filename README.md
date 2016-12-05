@@ -3,6 +3,9 @@
 Contao front end widget that provides [dropzonejs.com](http://www.dropzonejs.com/) functionality to both back and front end.
 The javascript is written in native javascript and invoked for both jquery and mootools on "document ready" and "ajax complete".
 
+![alt text](./doc/multifileupload-demo.jpg "Multifileupload demo within contao backend")
+
+
 ## Features
 
 ### Technical instructions
