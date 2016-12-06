@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [1.1.2] - 2016-12-06
+## [1.1.3] - 2016-12-06
 
 ### Fixed
 - invalid json in "assets/img/mimetypes/Numix-uTouch/mimetypes.json"
