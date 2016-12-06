@@ -12,7 +12,6 @@
 
 namespace HeimrichHannot\MultiFileUpload;
 
-use HeimrichHannot\Haste\Util\Environment;
 use HeimrichHannot\Haste\Util\Files;
 use HeimrichHannot\Haste\Util\StringUtil;
 use HeimrichHannot\Haste\Util\Url;
@@ -23,6 +22,11 @@ class MultiFileUpload extends \FileUpload
 
     protected $strTemplate       = 'form_multifileupload_dropzone';
     protected $strJQueryTemplate = 'j_multifileupload_dropzone';
+
+    /**
+     * @var FormMultiFileUpload
+     */
+    protected $objWidget;
 
     const NAME                  = 'multifileupload';
     const ACTION_UPLOAD         = 'upload';
@@ -41,10 +45,11 @@ class MultiFileUpload extends \FileUpload
 
     protected $blnIsXhtml = false;
 
-    public function __construct($arrAttributes)
+    public function __construct($arrAttributes, $objWidget = null)
     {
         parent::__construct();
-        $this->arrData = $arrAttributes;
+        $this->arrData   = $arrAttributes;
+        $this->objWidget = $objWidget;
 
         $file = \Input::get('file', true);
 
@@ -88,6 +93,7 @@ class MultiFileUpload extends \FileUpload
 
     /**
      * Get maximum file size in bytes
+     *
      * @param null $maxUploadSize
      *
      * @return mixed
@@ -161,6 +167,7 @@ class MultiFileUpload extends \FileUpload
         $objT->uploadedFiles         = '[]';
         $objT->deletedFiles          = '[]';
         $objT->attributes            = $this->getAttributes($this->getDropZoneOptions());
+        $objT->widget                = $this->objWidget;
 
         return $objT->parse();
     }

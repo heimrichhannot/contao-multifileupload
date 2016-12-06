@@ -87,7 +87,7 @@ class FormMultiFileUpload extends \Upload
 
         parent::__construct($arrAttributes);
 
-        $this->objUploader = new MultiFileUpload($arrAttributes);
+        $this->objUploader = new MultiFileUpload($arrAttributes, $this);
 
         // add onsubmit_callback: move files after form submission
         $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']['multifileupload_moveFiles'] =
