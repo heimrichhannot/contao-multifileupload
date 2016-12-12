@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.5] - 2016-12-12
+
+### Fixed
+- support binary(16) fields
+
 ## [1.1.4] - 2016-12-06
 
 ### Fixed

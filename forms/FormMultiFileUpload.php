@@ -35,6 +35,12 @@ class FormMultiFileUpload extends \Upload
 
     protected static $uploadAction = 'upload';
 
+    /**
+     * For binary(16) fields the values must be provided as single field
+     * @var bool
+     */
+    protected $blnSingleFile = false;
+
     const UNIQID_PREFIX = 'mfuid';
 
     public function __construct($arrAttributes = null)
@@ -45,6 +51,20 @@ class FormMultiFileUpload extends \Upload
             throw new \Exception(
                 sprintf($GLOBALS['TL_LANG']['ERR']['noUploadFolderDeclared'], $this->name)
             );
+        }
+
+        if($arrAttributes !== null && $arrAttributes['strTable'])
+        {
+            $arrTableFields = \Database::getInstance()->listFields($arrAttributes['strTable']);
+
+            foreach ($arrTableFields as $arrField)
+            {
+                if ($arrField['name'] == $arrAttributes['name'] && $arrField['type'] != 'index' && $arrField['type'] == 'binary')
+                {
+                    $this->blnSingleFile = true;
+                    break;
+                }
+            }
         }
 
         $arrAttributes['uploadAction'] = static::$uploadAction;
@@ -337,7 +357,7 @@ class FormMultiFileUpload extends \Upload
             $arrFiles = \StringUtil::uuidToBin($arrFiles);
         }
 
-        return $arrFiles;
+        return $this->blnSingleFile ? reset($arrFiles) : $arrFiles;
     }
 
     /**

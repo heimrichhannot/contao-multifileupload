@@ -168,7 +168,6 @@ class MultiFileUpload extends \FileUpload
         $objT->deletedFiles          = '[]';
         $objT->attributes            = $this->getAttributes($this->getDropZoneOptions());
         $objT->widget                = $this->objWidget;
-
         return $objT->parse();
     }
 
@@ -368,10 +367,10 @@ class MultiFileUpload extends \FileUpload
                     $href        = 'contao/popup.php?src=' . base64_encode($objFile->value);
 
                     return 'Backend.openModalIframe({"width":"' . $popupWidth . '","title":"' . str_replace(
-                        "'",
-                        "\\'",
-                        specialchars($strFileNameEncoded, false, true)
-                    ) . '","url":"' . $href . '","height":"' . $popupHeight . '"});return false';
+                            "'",
+                            "\\'",
+                            specialchars($strFileNameEncoded, false, true)
+                        ) . '","url":"' . $href . '","height":"' . $popupHeight . '"});return false';
                 }
                 break;
         }
