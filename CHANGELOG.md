@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.6] - 2016-12-12
+
+### Fixed
+- support file preview within popup
+
 ## [1.1.5] - 2016-12-12
 
 ### Fixed

@@ -356,12 +356,6 @@ class MultiFileUpload extends \FileUpload
 
                 break;
             case 'BE':
-                if (\Input::get('popup'))
-                {
-                    return null;
-                }
-                else
-                {
                     $popupWidth  = 664;
                     $popupHeight = 299;
                     $href        = 'contao/popup.php?src=' . base64_encode($objFile->value);
@@ -371,7 +365,6 @@ class MultiFileUpload extends \FileUpload
                             "\\'",
                             specialchars($strFileNameEncoded, false, true)
                         ) . '","url":"' . $href . '","height":"' . $popupHeight . '"});return false';
-                }
                 break;
         }
 
