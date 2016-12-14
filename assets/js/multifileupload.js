@@ -23,6 +23,11 @@
                 file.previewElement.setAttribute('onclick', action);
                 file.previewElement.className = "" + file.previewElement.className + " has-info";
             },
+            camelize = function(str) {
+                return str.replace(/[\-_](\w)/g, function(match) {
+                    return match.charAt(1).toUpperCase();
+                });
+            },
             __defaults = {
                 init: function () {
                     // listeners
@@ -178,7 +183,7 @@
                             formData.append(input.name, input.value);
                         }
                     }).on('addedfile', function (file) {
-                        if(this.files.length > 0){
+                        if (this.files.length > 0) {
                             this.element.classList.add('dz-has-files');
                         }
                     });
@@ -226,7 +231,22 @@
                     // do not attach Dropzone again
                     if (typeof field.dropzone != 'undefined') continue;
 
-                    data = field.dataset;
+                    var attributes = field.attributes,
+                        i = attributes.length,
+                        data = field.dataset;
+
+                    // ie 10 supports no dataset
+                    if(typeof data == 'undefined')
+                    {
+                        data = {};
+
+                        for (; i--; ){
+                            if (/^data-.*/.test(attributes[i].name)) {
+                                var key = camelize(attributes[i].name.replace('data-', ''));
+                                data[key] = attributes[i].value;
+                            }
+                        }
+                    }
 
                     var config = __extends(data, __defaults);
 

@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.7] - 2016-12-14
+
+### Fixed
+- support for IE10 (no dataset supported..)
+
 ## [1.1.6] - 2016-12-12
 
 ### Fixed
