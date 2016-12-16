@@ -253,7 +253,8 @@
                     config.url = history.state != null ? history.state.url : location.href;
 
                     if (config.uploadActionParams) {
-                        config.url = config.url + '?' + config.uploadActionParams;
+                        config.url = config.url;
+                        config.url += (config.url.split('?')[1] ? '&':'?') + config.uploadActionParams;
                     }
 
                     new Dropzone(field, config);

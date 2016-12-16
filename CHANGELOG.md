@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.8] - 2016-12-16
+
+### Fixed
+- consider existing `?` in `config.uploadActionParams`
+
 ## [1.1.7] - 2016-12-14
 
 ### Fixed
