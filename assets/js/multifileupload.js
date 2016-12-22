@@ -223,7 +223,7 @@
             },
             registerFields: function () {
 
-                var fields = document.getElementsByClassName('multifileupload');
+                var fields = document.querySelectorAll('.multifileupload');
 
                 for (var i = 0, len = fields.length; i < len; i++) {
                     var field = fields[i];
@@ -232,7 +232,7 @@
                     if (typeof field.dropzone != 'undefined') continue;
 
                     var attributes = field.attributes,
-                        i = attributes.length,
+                        n = attributes.length,
                         data = field.dataset;
 
                     // ie 10 supports no dataset
@@ -240,10 +240,10 @@
                     {
                         data = {};
 
-                        for (; i--; ){
-                            if (/^data-.*/.test(attributes[i].name)) {
-                                var key = camelize(attributes[i].name.replace('data-', ''));
-                                data[key] = attributes[i].value;
+                        for (; n--; ){
+                            if (/^data-.*/.test(attributes[n].name)) {
+                                var key = camelize(attributes[n].name.replace('data-', ''));
+                                data[key] = attributes[n].value;
                             }
                         }
                     }
@@ -256,6 +256,7 @@
                         config.url = config.url;
                         config.url += (config.url.split('?')[1] ? '&':'?') + config.uploadActionParams;
                     }
+
 
                     new Dropzone(field, config);
                 }
@@ -287,3 +288,4 @@
 
     }
 ).call(this);
+

@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.9] - 2016-12-22
+
+### Fixed
+- support multiple fields properly, iterator issue
+
 ## [1.1.8] - 2016-12-16
 
 ### Fixed
