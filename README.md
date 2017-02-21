@@ -32,6 +32,7 @@ Use the inputType "multifileupload" for your field. In the backend, the widget i
             'head' => &$GLOBALS['TL_LANG']['tl_jobmarket_job']['client_logo']['messageText'][0],
             'body' => &$GLOBALS['TL_LANG']['tl_jobmarket_job']['client_logo']['messageText'][1],
         ),
+        'skipDeleteAfterSubmit' => true
     ),
     'upload_path_callback' => array(array('MyClass', 'getJobUploadPath')),
     'validate_upload_callback' => array(array('MyClass', 'validateUpload')),
@@ -69,6 +70,7 @@ mimeThumbnailsOnly | boolean(false) | Set to true if you want to show mime image
 thumbnailWidth | 90 | The thumbnail width (in px) of the uploaded file preview within the dropzone preview container.
 thumbnailHeight | 90 | The thumbnail height (in px) of the uploaded file preview within the dropzone preview container.
 labels | array() | Overwrite the head and body labels within the upload field.
+skipDeleteAfterSubmit | false | Prevent file removal from filesystem.
 
 
 ### Field Callbacks

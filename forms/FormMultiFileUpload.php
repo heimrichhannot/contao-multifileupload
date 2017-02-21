@@ -316,7 +316,10 @@ class FormMultiFileUpload extends \Upload
             return;
         }
 
-        $this->deleteScheduledFiles($arrDeleted);
+        if(!$this->skipDeleteAfterSubmit)
+        {
+            $this->deleteScheduledFiles($arrDeleted);
+        }
 
         if (is_array($arrFiles))
         {

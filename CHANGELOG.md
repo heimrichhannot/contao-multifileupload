@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.10] - 2016-02-21
+
+### Added
+- eval flag `skipDeleteAfterSubmit`
+
 ## [1.1.9] - 2016-12-22
 
 ### Fixed
