@@ -12,17 +12,17 @@
 /**
  * Register the namespaces
  */
-ClassLoader::addNamespaces(array
-(
-	'HeimrichHannot',
-));
+ClassLoader::addNamespaces(
+    [
+	'HeimrichHannot',]
+);
 
 
 /**
  * Register the classes
  */
-ClassLoader::addClasses(array
-(
+ClassLoader::addClasses(
+    [
 	// Forms
 	'HeimrichHannot\MultiFileUpload\FormMultiFileUpload'           => 'system/modules/multifileupload/forms/FormMultiFileUpload.php',
 
@@ -30,14 +30,14 @@ ClassLoader::addClasses(array
 	'HeimrichHannot\MultiFileUpload\Widget\BackendMultiFileUpload' => 'system/modules/multifileupload/widgets/BackendMultiFileUpload.php',
 
 	// Classes
-	'HeimrichHannot\MultiFileUpload\MultiFileUpload'               => 'system/modules/multifileupload/classes/MultiFileUpload.php',
-));
+	'HeimrichHannot\MultiFileUpload\MultiFileUpload'               => 'system/modules/multifileupload/classes/MultiFileUpload.php',]
+);
 
 
 /**
  * Register the templates
  */
-TemplateLoader::addFiles(array
-(
-	'form_multifileupload_dropzone' => 'system/modules/multifileupload/templates/forms',
-));
+TemplateLoader::addFiles(
+    [
+	'form_multifileupload_dropzone' => 'system/modules/multifileupload/templates/forms',]
+);

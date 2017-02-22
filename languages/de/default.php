@@ -1,13 +1,13 @@
 <?php
 
-$GLOBALS['TL_LANG']['MSC']['dropzone']['labels'] = array(
+$GLOBALS['TL_LANG']['MSC']['dropzone']['labels'] = [
     'head' => '',
     'body' => 'Um eine Datei hochzuladen, ziehen Sie diese hierhin oder klicken Sie das Feld an.',
     'foot' => '',
-);
+];
 
 // dots in order to prevent contao from doing a replaceInsertTags() and remove them
-$GLOBALS['TL_LANG']['MSC']['dropzone']['messages'] = array(
+$GLOBALS['TL_LANG']['MSC']['dropzone']['messages'] = [
     'dictDefaultMessage'           => 'Um eine Datei hochzuladen, ziehen Sie diese hierhin oder klicken Sie das Feld an.',
     'dictFallbackMessage'          => 'Ihr Browser unterstützt keine Drag&Drop-Uploads.',
     'dictFallbackText'             => 'Bitte nutzen Sie das untenstehende Formular für den Upload.',
@@ -19,7 +19,7 @@ $GLOBALS['TL_LANG']['MSC']['dropzone']['messages'] = array(
     'dictRemoveFile'               => 'Entfernen',
     'dictRemoveFileConfirmation'   => null,
     'dictMaxFilesExceeded'         => 'Sie können nicht noch mehr Dateien hochladen.'
-);
+];
 
 $GLOBALS['TL_LANG']['ERR']['invalidUuid'] = 'Der Datei wurde kein eindeutiger Kennzeichner (uuid) zugewiesen, bitte versuchen Sie die Datei erneut hochzuladen.';
 $GLOBALS['TL_LANG']['ERR']['moveUploadFile'] = 'Ungültige Datei oder Fehler beim Verschieben der Datei (Berechtigungen des Speicherziels prüfen).';

@@ -42,11 +42,16 @@ $GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = [
 /**
  * Assets (add dropzone not within contao files manager)
  */
-if (!(TL_MODE == 'BE' && \Input::get('do') == 'files'))
+if (TL_MODE == 'FE' || \Input::get('do') != 'files')
 {
-    if (\Config::get('enableMultiFileUploadFrontendStyles'))
+    if (TL_MODE == 'BE' && \Config::get('enableMultiFileUploadFrontendStyles'))
     {
         $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.css';
+    }
+
+    if (TL_MODE == 'FE')
+    {
+        $GLOBALS['TL_CSS']['dropzone'] = 'composer/vendor/enyo/dropzone/dist/min/dropzone.min.css';
     }
 
     $GLOBALS['TL_JAVASCRIPT']['dropzone']        = 'composer/vendor/enyo/dropzone/dist/min/dropzone.min.js';

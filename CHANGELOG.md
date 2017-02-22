@@ -1,12 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [1.1.11] - 2016-02-22
+## [1.1.12] - 2017-02-22
+
+### Fixed
+- js issue, css styles in fe
+
+## [1.1.11] - 2017-02-22
 
 ### Fixed
 - js issue
 
-## [1.1.10] - 2016-02-21
+## [1.1.10] - 2017-02-21
 
 ### Added
 - eval flag `skipDeleteAfterSubmit`

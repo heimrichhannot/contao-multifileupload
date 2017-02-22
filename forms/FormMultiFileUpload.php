@@ -97,11 +97,11 @@ class FormMultiFileUpload extends \Upload
             }
             else
             {
-                $arrAttributes['value'] = array(
+                $arrAttributes['value'] = [
                     \Validator::isBinaryUuid($arrAttributes['value']) ? \StringUtil::binToUuid(
                         $arrAttributes['value']
                     ) : $arrAttributes['value'],
-                );
+                ];
             }
         }
 
@@ -111,7 +111,7 @@ class FormMultiFileUpload extends \Upload
 
         // add onsubmit_callback: move files after form submission
         $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']['multifileupload_moveFiles'] =
-            array('HeimrichHannot\MultiFileUpload\FormMultiFileUpload', 'moveFiles');
+            ['HeimrichHannot\MultiFileUpload\FormMultiFileUpload', 'moveFiles'];
 
         Ajax::runActiveAction(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD, $this);
     }
@@ -142,7 +142,7 @@ class FormMultiFileUpload extends \Upload
 
             if (!is_array($arrFiles))
             {
-                $arrFiles = array($arrFiles);
+                $arrFiles = [$arrFiles];
             }
 
             $objFileModels = FilesModel::findMultipleByUuids($arrFiles);
@@ -153,7 +153,7 @@ class FormMultiFileUpload extends \Upload
             }
 
             $arrPaths   = $objFileModels->fetchEach('path');
-            $arrTargets = array();
+            $arrTargets = [];
 
             // do not loop over $objFileModels as $objFile->close() will pull models away
             foreach ($arrPaths as $strPath)
@@ -236,7 +236,7 @@ class FormMultiFileUpload extends \Upload
             {
                 for ($i = 0; $i < count($varFile['name']); $i++)
                 {
-                    $arrFiles = array();
+                    $arrFiles = [];
 
                     foreach (array_keys($varFile) as $strKey)
                     {
@@ -433,10 +433,10 @@ class FormMultiFileUpload extends \Upload
                 $error = &$GLOBALS['TL_LANG']['ERR']['moveUploadFile'];
             }
 
-            $arrData = array(
+            $arrData = [
                 'filename'     => $strTargetFileName,
                 'filenameOrig' => $arrFile['name'],
-            );
+            ];
 
             if (!$error)
             {
@@ -501,10 +501,10 @@ class FormMultiFileUpload extends \Upload
             return $arrData;
         }
 
-        return array(
+        return [
             'error' => $arrFile['error'],
             'filenameOrig' => $arrFile['name']
-        );
+        ];
     }
 
     public function getUploader()
@@ -514,7 +514,7 @@ class FormMultiFileUpload extends \Upload
 
     public function deleteScheduledFiles($arrScheduledFiles)
     {
-        $arrFiles = array();
+        $arrFiles = [];
 
         if (empty($arrScheduledFiles))
         {

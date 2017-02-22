@@ -18,7 +18,7 @@ use HeimrichHannot\Haste\Util\Url;
 
 class MultiFileUpload extends \FileUpload
 {
-    protected $arrData = array();
+    protected $arrData = [];
 
     protected $strTemplate       = 'form_multifileupload_dropzone';
     protected $strJQueryTemplate = 'j_multifileupload_dropzone';
@@ -156,7 +156,7 @@ class MultiFileUpload extends \FileUpload
      */
     public function generateMarkup()
     {
-        $arrValues = array_values($this->value ?: array());
+        $arrValues = array_values($this->value ?: []);
 
         $objT = new \FrontendTemplate($this->strTemplate);
         $objT->setData($this->arrData);
@@ -178,9 +178,9 @@ class MultiFileUpload extends \FileUpload
      *
      * @return string
      */
-    protected function getAttributes(array $arrAttributes = array())
+    protected function getAttributes(array $arrAttributes = [])
     {
-        $arrOptions = array();
+        $arrOptions = [];
 
         foreach ($arrAttributes as $strKey => $varValue)
         {
@@ -221,7 +221,7 @@ class MultiFileUpload extends \FileUpload
      */
     protected function getDropZoneOptions()
     {
-        $arrOptions = array();
+        $arrOptions = [];
 
         foreach (array_keys($this->arrData) as $strKey)
         {
@@ -297,7 +297,7 @@ class MultiFileUpload extends \FileUpload
     {
         if (!empty($this->value))
         {
-            $arrResult = array();
+            $arrResult = [];
 
             foreach ($this->value as $strUuid)
             {
@@ -317,12 +317,12 @@ class MultiFileUpload extends \FileUpload
         {
             static::addAllowedDownload($objFile->value);
 
-            $arrReturn = array(
+            $arrReturn = [
                 // remove timestamp from filename
                 'name' => StringUtil::preg_replace_last('@_[a-f0-9]{13}@', $objFile->name),
                 'uuid' => \StringUtil::binToUuid($objFile->getModel()->uuid),
                 'size' => $objFile->filesize,
-            );
+            ];
 
             if (($strImage = $this->getPreviewImage($objFile)) !== null)
             {
@@ -377,7 +377,7 @@ class MultiFileUpload extends \FileUpload
 
         if (!is_array($arrDownloads))
         {
-            $arrDownloads = array();
+            $arrDownloads = [];
         }
 
         $arrDownloads[] = $strFile;

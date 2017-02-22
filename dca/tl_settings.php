@@ -19,15 +19,13 @@ $arrDca['palettes']['default'] .= '{multifileupload_legend},enableMultiFileUploa
 /**
  * Fields
  */
-$arrFields = array(
-	'enableMultiFileUploadFrontendStyles' => array
-	(
+$arrFields = [
+	'enableMultiFileUploadFrontendStyles' => [
 		'label'     => &$GLOBALS['TL_LANG']['tl_settings']['enableMultiFileUploadFrontendStyles'],
 		'exclude'   => true,
 		'inputType' => 'checkbox',
 		'default'   => true,
-		'eval'      => array('tl_class' => 'w50')
-	)
-);
+		'eval'      => ['tl_class' => 'w50']]
+];
 
 $arrDca['fields'] = array_merge($arrFields, $arrDca['fields']);

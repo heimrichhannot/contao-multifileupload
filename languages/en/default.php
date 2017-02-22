@@ -1,13 +1,13 @@
 <?php
 
-$GLOBALS['TL_LANG']['MSC']['dropzone']['labels'] = array(
+$GLOBALS['TL_LANG']['MSC']['dropzone']['labels'] = [
     'head' => '',
     'body' => 'To upload a file, drop it here or click the field.',
     'foot' => '',
-);
+];
 
 // dots in order to prevent contao from doing a replaceInsertTags() and remove them
-$GLOBALS['TL_LANG']['MSC']['dropzone']['messages'] = array(
+$GLOBALS['TL_LANG']['MSC']['dropzone']['messages'] = [
     'dictDefaultMessage'           => 'Drop files here to upload',
     'dictFallbackMessage'          => 'Your browser does not support drag\'n\'drop file uploads.',
     'dictFallbackText'             => 'Please use the fallback form below to upload your files like in the olden days.',
@@ -19,7 +19,7 @@ $GLOBALS['TL_LANG']['MSC']['dropzone']['messages'] = array(
     'dictRemoveFile'               => 'Remove file',
     'dictRemoveFileConfirmation'   => null,
     'dictMaxFilesExceeded'         => 'You can not upload any more files.',
-);
+];
 
 $GLOBALS['TL_LANG']['ERR']['invalidUuid'] = 'No unique identifier (uuid) has been assigned to the file, please try to upload the file again.';
 $GLOBALS['TL_LANG']['ERR']['moveUploadFile'] = 'Invalid file or error on moving files, check permissions or upload destination.';

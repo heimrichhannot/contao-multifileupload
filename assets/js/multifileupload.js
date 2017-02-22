@@ -213,7 +213,7 @@
                         }
                     }
                 }
-            }
+            };
 
         MultiFileUpload = {
             init: function () {
@@ -248,14 +248,14 @@
                         }
                     }
 
-                    var config = __extends(data, __defaults);
+                    var config = __extends(data, __defaults),
+                        params = HASTE_PLUS.parseQueryString(config.uploadActionParams);
 
-                    config.url = typeof history.state.url !== 'undefined' ? history.state.url : location.href;
+                    config.url = (typeof history.state !== 'undefined' && typeof history.state.url !== 'undefined') ? history.state.url : location.href;
 
                     if (config.uploadActionParams) {
-                        config.url += (config.url.split('?')[1] ? '&':'?') + config.uploadActionParams;
+                        config.url = HASTE_PLUS.addParametersToUri(config.url, params);
                     }
-
 
                     new Dropzone(field, config);
                 }
