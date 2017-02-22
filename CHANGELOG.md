@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.11] - 2016-02-22
+
+### Fixed
+- js issue
+
 ## [1.1.10] - 2016-02-21
 
 ### Added
