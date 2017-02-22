@@ -248,12 +248,17 @@
                         }
                     }
 
-                    var config = __extends(data, __defaults),
-                        params = HASTE_PLUS.parseQueryString(config.uploadActionParams);
+                    var config = __extends(data, __defaults);
 
-                    config.url = (typeof history.state !== 'undefined' && typeof history.state.url !== 'undefined') ? history.state.url : location.href;
+                    config.url = location.href;
+
+                    if (HASTE_PLUS.isTruthy(history.state) && HASTE_PLUS.isTruthy(history.state.url))
+                    {
+                        config.url = history.state.url;
+                    }
 
                     if (config.uploadActionParams) {
+                        var params = HASTE_PLUS.parseQueryString(config.uploadActionParams);
                         config.url = HASTE_PLUS.addParametersToUri(config.url, params);
                     }
 
