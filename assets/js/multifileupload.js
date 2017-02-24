@@ -248,6 +248,18 @@
                         }
                     }
 
+                    function replaceAll(subject, search, replacement) {
+                        return subject.split(search).join(replacement);
+                    }
+
+                    var localizations = ['dictFileTooBig', 'dictResponseError'];
+
+                    for (var j = 0; j < localizations.length; j++)
+                    {
+                        data[localizations[j]] = replaceAll(data[localizations[j]], '{.{', '{{');
+                        data[localizations[j]] = replaceAll(data[localizations[j]], '}.}', '}}');
+                    }
+
                     var config = __extends(data, __defaults);
 
                     config.url = location.href;

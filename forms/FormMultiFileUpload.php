@@ -45,8 +45,15 @@ class FormMultiFileUpload extends \Upload
 
     public function __construct($arrAttributes = null)
     {
+        // this is the case for 'onsubmit_callback' => 'multifileupload_moveFiles'
+        if ($arrAttributes === null)
+        {
+            $arrAttributes = [];
+            $arrAttributes['isSubmitCallback'] = true;
+        }
+
         // check against arrAttributes, as 'onsubmit_callback' => 'multifileupload_moveFiles' does not provide valid attributes
-        if ($arrAttributes !== null && !$arrAttributes['uploadFolder'])
+        if (!$arrAttributes['isSubmitCallback'] && !$arrAttributes['uploadFolder'])
         {
             throw new \Exception(
                 sprintf($GLOBALS['TL_LANG']['ERR']['noUploadFolderDeclared'], $this->name)

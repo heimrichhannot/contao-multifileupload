@@ -69,7 +69,10 @@ class MultiFileUpload extends \FileUpload
 
         $this->blnIsXhtml = ($objPage->outputFormat == 'xhtml');
 
-        $this->loadDcaConfig();
+        if (!$arrAttributes['isSubmitCallback'])
+        {
+            $this->loadDcaConfig();
+        }
     }
 
     protected function getByteSize($size)
@@ -100,10 +103,26 @@ class MultiFileUpload extends \FileUpload
      */
     protected function getMaximumUploadSize($maxUploadSize = null)
     {
-        // Get the upload_max_filesize from the php.ini
-        $upload_max_filesize = $this->getByteSize($maxUploadSize ?: ini_get('upload_max_filesize'));
+        $intMaxUploadSizeDca = $this->getByteSize($maxUploadSize ?: ini_get('upload_max_filesize'));
+        $intMaxUploadSizeSettings = $this->getByteSize(\Config::get('maxFileSize') ?: ini_get('upload_max_filesize'));
+        $intMaxUploadSizePhp = $this->getByteSize(ini_get('upload_max_filesize'));
 
-        return min($upload_max_filesize, $this->getByteSize(\Config::get('maxFileSize')), $this->getByteSize(ini_get('upload_max_filesize')));
+        if ($intMaxUploadSizeDca > $intMaxUploadSizeSettings)
+        {
+            throw new \Exception('The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in tl_settings.');
+        }
+
+        if ($intMaxUploadSizeDca > $intMaxUploadSizePhp)
+        {
+            throw new \Exception('The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in php.ini.');
+        }
+
+        if ($intMaxUploadSizeSettings > $intMaxUploadSizePhp)
+        {
+            throw new \Exception('The maximum upload size you defined in tl_settings exceeds the limit in php.ini.');
+        }
+
+        return min($intMaxUploadSizeDca, $intMaxUploadSizeSettings, $intMaxUploadSizePhp);
     }
 
     protected function loadDcaConfig()

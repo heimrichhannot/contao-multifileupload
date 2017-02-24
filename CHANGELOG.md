@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.15] - 2017-02-24
+
+### Fixed
+- upload size issues
+- fixed localization bugs
+
 ## [1.1.14] - 2017-02-23
 
 ### Fixed
