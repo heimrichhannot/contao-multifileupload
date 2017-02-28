@@ -37,6 +37,7 @@ class FormMultiFileUpload extends \Upload
 
     /**
      * For binary(16) fields the values must be provided as single field
+     *
      * @var bool
      */
     protected $blnSingleFile = false;
@@ -48,7 +49,7 @@ class FormMultiFileUpload extends \Upload
         // this is the case for 'onsubmit_callback' => 'multifileupload_moveFiles'
         if ($arrAttributes === null)
         {
-            $arrAttributes = [];
+            $arrAttributes                     = [];
             $arrAttributes['isSubmitCallback'] = true;
         }
 
@@ -60,7 +61,7 @@ class FormMultiFileUpload extends \Upload
             );
         }
 
-        if($arrAttributes !== null && $arrAttributes['strTable'])
+        if ($arrAttributes !== null && $arrAttributes['strTable'])
         {
             $arrTableFields = \Database::getInstance()->listFields($arrAttributes['strTable']);
 
@@ -116,9 +117,18 @@ class FormMultiFileUpload extends \Upload
 
         $this->objUploader = new MultiFileUpload($arrAttributes, $this);
 
-        // add onsubmit_callback: move files after form submission
-        $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']['multifileupload_moveFiles'] =
-            ['HeimrichHannot\MultiFileUpload\FormMultiFileUpload', 'moveFiles'];
+        // add onsubmit_callback at first onsubmit_callback position: move files after form submission
+        if (is_array($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']))
+        {
+            $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback'] =
+                ['multifileupload_moveFiles' => ['HeimrichHannot\MultiFileUpload\FormMultiFileUpload', 'moveFiles']]
+                + $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback'];
+        }
+        else
+        {
+            $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']['multifileupload_moveFiles'] =
+                ['HeimrichHannot\MultiFileUpload\FormMultiFileUpload', 'moveFiles'];
+        }
 
         Ajax::runActiveAction(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD, $this);
     }
@@ -323,7 +333,7 @@ class FormMultiFileUpload extends \Upload
             return;
         }
 
-        if(!$this->skipDeleteAfterSubmit)
+        if (!$this->skipDeleteAfterSubmit)
         {
             $this->deleteScheduledFiles($arrDeleted);
         }
@@ -381,32 +391,32 @@ class FormMultiFileUpload extends \Upload
     {
         $error = false;
 
-        if($objFile->isImage)
+        if ($objFile->isImage)
         {
-            $minWidth = \Image::getPixelValue($this->minImageWidth);
+            $minWidth  = \Image::getPixelValue($this->minImageWidth);
             $minHeight = \Image::getPixelValue($this->minImageHeight);
 
-            $maxWidth = \Image::getPixelValue($this->maxImageWidth);
+            $maxWidth  = \Image::getPixelValue($this->maxImageWidth);
             $maxHeight = \Image::getPixelValue($this->maxImageHeight);
 
-            if($minWidth > 0 && $objFile->width < $minWidth)
+            if ($minWidth > 0 && $objFile->width < $minWidth)
             {
-                return sprintf($this->minImageWidthErrorText ? : $GLOBALS['TL_LANG']['ERR']['minWidth'], $minWidth, $objFile->width);
+                return sprintf($this->minImageWidthErrorText ?: $GLOBALS['TL_LANG']['ERR']['minWidth'], $minWidth, $objFile->width);
             }
 
-            if($minHeight > 0 && $objFile->height < $minHeight)
+            if ($minHeight > 0 && $objFile->height < $minHeight)
             {
-                return sprintf($this->minImageHeightErrorText ? : $GLOBALS['TL_LANG']['ERR']['minHeight'], $minHeight, $objFile->height);
+                return sprintf($this->minImageHeightErrorText ?: $GLOBALS['TL_LANG']['ERR']['minHeight'], $minHeight, $objFile->height);
             }
 
-            if($maxWidth > 0 && $objFile->width > $maxWidth)
+            if ($maxWidth > 0 && $objFile->width > $maxWidth)
             {
-                return sprintf($this->maxImageWidthErrorText ? : $GLOBALS['TL_LANG']['ERR']['maxWidth'], $maxWidth, $objFile->width);
+                return sprintf($this->maxImageWidthErrorText ?: $GLOBALS['TL_LANG']['ERR']['maxWidth'], $maxWidth, $objFile->width);
             }
 
-            if($maxHeight > 0 && $objFile->height > $maxHeight)
+            if ($maxHeight > 0 && $objFile->height > $maxHeight)
             {
-                return sprintf($this->maxImageHeightErrorText ? : $GLOBALS['TL_LANG']['ERR']['maxHeight'], $maxHeight, $objFile->height);
+                return sprintf($this->maxImageHeightErrorText ?: $GLOBALS['TL_LANG']['ERR']['maxHeight'], $maxHeight, $objFile->height);
             }
         }
 
@@ -500,7 +510,7 @@ class FormMultiFileUpload extends \Upload
             $arrData['error'] = $error;
 
             // remove invalid files from tmp folder
-            if($objFile instanceof \File)
+            if ($objFile instanceof \File)
             {
                 $objFile->delete();
             }
@@ -509,8 +519,8 @@ class FormMultiFileUpload extends \Upload
         }
 
         return [
-            'error' => $arrFile['error'],
-            'filenameOrig' => $arrFile['name']
+            'error'        => $arrFile['error'],
+            'filenameOrig' => $arrFile['name'],
         ];
     }
 

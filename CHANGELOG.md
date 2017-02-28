@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.16] - 2017-02-28
+
+### Fixed
+- attach `multifileupload_moveFiles` onsubmit_callback always at first position of all onsubmit_callbacks
+
 ## [1.1.15] - 2017-02-24
 
 ### Fixed
