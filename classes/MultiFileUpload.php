@@ -96,31 +96,45 @@ class MultiFileUpload extends \FileUpload
 
     /**
      * Get maximum file size in bytes
-     *
      * @param null $maxUploadSize
      *
      * @return mixed
+     * @throws \Exception For backend admin users, if widget upload size exceeds php.ini size or settings upload size
      */
     protected function getMaximumUploadSize($maxUploadSize = null)
     {
-        $intMaxUploadSizeDca = $this->getByteSize($maxUploadSize ?: ini_get('upload_max_filesize'));
+        $intMaxUploadSizeDca      = $this->getByteSize($maxUploadSize ?: ini_get('upload_max_filesize'));
         $intMaxUploadSizeSettings = $this->getByteSize(\Config::get('maxFileSize') ?: ini_get('upload_max_filesize'));
-        $intMaxUploadSizePhp = $this->getByteSize(ini_get('upload_max_filesize'));
+        $intMaxUploadSizePhp      = $this->getByteSize(ini_get('upload_max_filesize'));
+
+        $strError = null;
 
         if ($intMaxUploadSizeDca > $intMaxUploadSizeSettings)
         {
-            throw new \Exception('The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in tl_settings.');
+            $strError = 'The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in tl_settings.';
+        }
+        else if ($intMaxUploadSizeDca > $intMaxUploadSizePhp)
+        {
+            $strError = 'The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in php.ini.';
+        }
+        else if ($intMaxUploadSizeSettings > $intMaxUploadSizePhp)
+        {
+            $strError = 'The maximum upload size you defined in tl_settings exceeds the limit in php.ini.';
         }
 
-        if ($intMaxUploadSizeDca > $intMaxUploadSizePhp)
+        // throw maximum upload size exceptions only in back end for admins/developer
+        if ($strError !== null)
         {
-            throw new \Exception('The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in php.ini.');
+            if (TL_MODE == 'BE' && \BackendUser::getInstance()->isAdmin)
+            {
+                throw new \Exception($strError);
+            }
+            else
+            {
+                \System::log($strError, __METHOD__, TL_ERROR);
+            }
         }
 
-        if ($intMaxUploadSizeSettings > $intMaxUploadSizePhp)
-        {
-            throw new \Exception('The maximum upload size you defined in tl_settings exceeds the limit in php.ini.');
-        }
 
         return min($intMaxUploadSizeDca, $intMaxUploadSizeSettings, $intMaxUploadSizePhp);
     }
@@ -187,6 +201,7 @@ class MultiFileUpload extends \FileUpload
         $objT->deletedFiles          = '[]';
         $objT->attributes            = $this->getAttributes($this->getDropZoneOptions());
         $objT->widget                = $this->objWidget;
+
         return $objT->parse();
     }
 
@@ -375,15 +390,15 @@ class MultiFileUpload extends \FileUpload
 
                 break;
             case 'BE':
-                    $popupWidth  = 664;
-                    $popupHeight = 299;
-                    $href        = 'contao/popup.php?src=' . base64_encode($objFile->value);
+                $popupWidth  = 664;
+                $popupHeight = 299;
+                $href        = 'contao/popup.php?src=' . base64_encode($objFile->value);
 
-                    return 'Backend.openModalIframe({"width":"' . $popupWidth . '","title":"' . str_replace(
-                            "'",
-                            "\\'",
-                            specialchars($strFileNameEncoded, false, true)
-                        ) . '","url":"' . $href . '","height":"' . $popupHeight . '"});return false';
+                return 'Backend.openModalIframe({"width":"' . $popupWidth . '","title":"' . str_replace(
+                        "'",
+                        "\\'",
+                        specialchars($strFileNameEncoded, false, true)
+                    ) . '","url":"' . $href . '","height":"' . $popupHeight . '"});return false';
                 break;
         }
 

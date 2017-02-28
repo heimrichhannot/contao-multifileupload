@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.17] - 2017-02-28
+
+### Fixed
+- Exception handling for exceed given dca field uploadSize changed, only for admin in backend mode, otherwise System:log entry 
+
 ## [1.1.16] - 2017-02-28
 
 ### Fixed
