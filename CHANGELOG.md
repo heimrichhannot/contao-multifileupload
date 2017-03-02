@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.18] - 2017-03-02
+
+### Fixed
+- bug in upload size exception handling
+
 ## [1.1.17] - 2017-02-28
 
 ### Fixed
