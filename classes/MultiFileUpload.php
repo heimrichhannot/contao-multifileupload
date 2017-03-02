@@ -135,6 +135,18 @@ class MultiFileUpload extends \FileUpload
             }
         }
 
+        if (!$intMaxUploadSizeDca && !$intMaxUploadSizeSettings)
+        {
+            return $intMaxUploadSizePhp;
+        }
+        elseif (!$intMaxUploadSizeDca)
+        {
+            return min($intMaxUploadSizeSettings, $intMaxUploadSizePhp);
+        }
+        elseif (!$intMaxUploadSizeSettings)
+        {
+            return min($intMaxUploadSizeDca, $intMaxUploadSizePhp);
+        }
 
         return min($intMaxUploadSizeDca, $intMaxUploadSizeSettings, $intMaxUploadSizePhp);
     }
