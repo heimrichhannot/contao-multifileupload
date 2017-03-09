@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.20] - 2017-03-09
+
+### Added
+- submitOnChange support added on adding files and deleting files (delete for multiple files only) 
+
 ## [1.1.19] - 2017-03-02
 
 ### Fixed

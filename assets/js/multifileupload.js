@@ -23,10 +23,23 @@
                 file.previewElement.setAttribute('onclick', action);
                 file.previewElement.className = "" + file.previewElement.className + " has-info";
             },
-            camelize = function(str) {
-                return str.replace(/[\-_](\w)/g, function(match) {
+            camelize = function (str) {
+                return str.replace(/[\-_](\w)/g, function (match) {
                     return match.charAt(1).toUpperCase();
                 });
+            },
+            __submitOnChange = function(dropzone, callback){
+                if (callback) {
+
+                    if(callback == 'this.form.submit()')
+                    {
+                        document.createElement('form').submit.call(__getField(dropzone).form);
+                        return;
+                    }
+
+                    var fn = Function(callback);
+                    fn();
+                }
             },
             __defaults = {
                 init: function () {
@@ -66,6 +79,11 @@
                             // remove dz-has-files css class
                             if (this.files.length < 1) {
                                 this.element.classList.remove('dz-has-files');
+                            }
+
+                            // submitOnChange support for multiple files only
+                            if(this.options.maxFiles != 1){
+                                __submitOnChange(this, this.options.onchange);
                             }
                         }
 
@@ -108,6 +126,8 @@
                                 __registerOnClick(file, file.info);
                             }
                         }
+
+                        __submitOnChange(dropzone, dropzone.options.onchange);
 
                         function persistFile(file, uploaded, filesToSave) {
                             if (typeof uploaded != 'undefined') {
@@ -236,11 +256,10 @@
                         data = field.dataset;
 
                     // ie 10 supports no dataset
-                    if(typeof data == 'undefined')
-                    {
+                    if (typeof data == 'undefined') {
                         data = {};
 
-                        for (; n--; ){
+                        for (; n--;) {
                             if (/^data-.*/.test(attributes[n].name)) {
                                 var key = camelize(attributes[n].name.replace('data-', ''));
                                 data[key] = attributes[n].value;
@@ -254,8 +273,7 @@
 
                     var localizations = ['dictFileTooBig', 'dictResponseError'];
 
-                    for (var j = 0; j < localizations.length; j++)
-                    {
+                    for (var j = 0; j < localizations.length; j++) {
                         data[localizations[j]] = replaceAll(data[localizations[j]], '{.{', '{{');
                         data[localizations[j]] = replaceAll(data[localizations[j]], '}.}', '}}');
                     }
@@ -264,8 +282,7 @@
 
                     config.url = location.href;
 
-                    if (HASTE_PLUS.isTruthy(history.state) && HASTE_PLUS.isTruthy(history.state.url))
-                    {
+                    if (HASTE_PLUS.isTruthy(history.state) && HASTE_PLUS.isTruthy(history.state.url)) {
                         config.url = history.state.url;
                     }
 

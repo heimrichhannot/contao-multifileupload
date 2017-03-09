@@ -96,6 +96,7 @@ class MultiFileUpload extends \FileUpload
 
     /**
      * Get maximum file size in bytes
+     *
      * @param null $maxUploadSize
      *
      * @return mixed
@@ -113,13 +114,19 @@ class MultiFileUpload extends \FileUpload
         {
             $strError = 'The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in tl_settings.';
         }
-        else if ($intMaxUploadSizeDca > $intMaxUploadSizePhp)
+        else
         {
-            $strError = 'The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in php.ini.';
-        }
-        else if ($intMaxUploadSizeSettings > $intMaxUploadSizePhp)
-        {
-            $strError = 'The maximum upload size you defined in tl_settings exceeds the limit in php.ini.';
+            if ($intMaxUploadSizeDca > $intMaxUploadSizePhp)
+            {
+                $strError = 'The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in php.ini.';
+            }
+            else
+            {
+                if ($intMaxUploadSizeSettings > $intMaxUploadSizePhp)
+                {
+                    $strError = 'The maximum upload size you defined in tl_settings exceeds the limit in php.ini.';
+                }
+            }
         }
 
         // throw maximum upload size exceptions only in back end for admins/developer
@@ -314,6 +321,9 @@ class MultiFileUpload extends \FileUpload
             case 'thumbnailHeight':
             case 'previewsContainer':
                 $varValue = $this->arrData[$strKey];
+                break;
+            case 'onchange':
+                $varValue = TL_MODE == 'BE' ? $this->arrData[$strKey] : 'this.form.submit()';
                 break;
             case 'createImageThumbnails':
                 $varValue = ($this->thumbnailWidth || $this->thumbnailHeight && $this->arrData[$strKey]) ? 'true' : 'false';
