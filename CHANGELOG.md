@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.22] - 2017-04-10
+
+### Fixed
+- restored missing test file
+
 ## [1.1.21] - 2017-04-10
 
 ### Added
