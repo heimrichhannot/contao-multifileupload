@@ -23,6 +23,8 @@ use HeimrichHannot\Ajax\Response\ResponseSuccess;
 use HeimrichHannot\Haste\Util\Files;
 use HeimrichHannot\Haste\Util\StringUtil;
 use HeimrichHannot\Request\Request;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FormMultiFileUpload extends \Upload
 {
@@ -82,6 +84,8 @@ class FormMultiFileUpload extends \Upload
             $arrAttributes['uploadActionParams'] = http_build_query(AjaxAction::getParams(MultiFileUpload::NAME, static::$uploadAction));
         }
 
+        $arrAttributes['parallelUploads'] = 1; // in order to provide new token for each ajax request, upload one by one
+
         $arrAttributes['addRemoveLinks'] = isset($arrAttributes['addRemoveLinks']) ? $arrAttributes['addRemoveLinks'] : true;
 
 
@@ -117,6 +121,13 @@ class FormMultiFileUpload extends \Upload
 
         $this->objUploader = new MultiFileUpload($arrAttributes, $this);
 
+        $arrAttributes = array_merge($arrAttributes, $this->objUploader->getData());
+
+        foreach ($arrAttributes as $strKey => $varValue)
+        {
+            $this->{$strKey} = $varValue;
+        }
+
         // add onsubmit_callback at first onsubmit_callback position: move files after form submission
         if (is_array($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']))
         {
@@ -126,8 +137,7 @@ class FormMultiFileUpload extends \Upload
         }
         else
         {
-            $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']['multifileupload_moveFiles'] =
-                ['HeimrichHannot\MultiFileUpload\FormMultiFileUpload', 'moveFiles'];
+            $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']['multifileupload_moveFiles'] = ['HeimrichHannot\MultiFileUpload\FormMultiFileUpload', 'moveFiles'];
         }
 
         Ajax::runActiveAction(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD, $this);
@@ -225,63 +235,71 @@ class FormMultiFileUpload extends \Upload
     public function upload()
     {
         // check for the request token
-        if (!\Input::post('requestToken') || !RequestToken::validate(\Input::post('requestToken')))
+        if (!Request::hasPost('requestToken') || !RequestToken::validate(Request::getPost('requestToken')))
         {
             $objResponse = new ResponseError();
             $objResponse->setMessage('Invalid Request Token!');
             $objResponse->output();
         }
 
+        if (!Request::getInstance()->files->has($this->name))
+        {
+            return;
+        }
+
         $objTmpFolder = new \Folder(MultiFileUpload::UPLOAD_TMP);
 
-        $arrUuids  = null;
-        $varReturn = null;
+        $strField = $this->name;
+        $varFile  = Request::getInstance()->files->get($strField);
 
-        // Dropzone Upload
-        if (!empty($_FILES))
+        // Multi-files upload at once
+        if (is_array($varFile))
         {
-            if (!isset($_FILES[$this->name]))
+            // prevent disk flooding
+            if (count($varFile) > $this->maxFiles)
             {
-                return;
+                $objResponse = new ResponseError();
+                $objResponse->setMessage('Bulk file upload violation.');
+                $objResponse->output();
             }
 
-            $strField = $this->name;
-            $varFile  = $_FILES[$strField];
-
-            // Multi-files upload at once
-            if (is_array($varFile['name']))
+            /**
+             * @var UploadedFile $objFile
+             */
+            foreach ($varFile as $strKey => $objFile)
             {
-                for ($i = 0; $i < count($varFile['name']); $i++)
+                $arrFile     = $this->uploadFile($objFile, $objTmpFolder->path, $strField);
+                $varReturn[] = $arrFile;
+
+                if (\Validator::isUuid($arrFile['uuid']))
                 {
-                    $arrFiles = [];
-
-                    foreach (array_keys($varFile) as $strKey)
-                    {
-                        $arrFiles[$strKey] = $varFile[$strKey][$i];
-                    }
-
-                    $arrFile     = $this->uploadFile($arrFiles, $objTmpFolder->path, $strField);
-                    $varReturn[] = $arrFile;
-                    $arrUuids[]  = $arrFile['uuid'];
+                    $arrUuids[] = $arrFile['uuid'];
                 }
             }
-            // Single-file upload
-            else
+        }
+        // Single-file upload
+        else
+        {
+            /**
+             * @var UploadedFile $varFile
+             */
+            $varReturn = $this->uploadFile($varFile, $objTmpFolder->path, $strField);
+
+            if (\Validator::isUuid($varReturn['uuid']))
             {
-                $varReturn  = $this->uploadFile($varFile, $objTmpFolder->path, $strField);
                 $arrUuids[] = $varReturn['uuid'];
             }
+        }
 
-            if ($varReturn !== null)
-            {
-                $this->varValue = $arrUuids;
-                $objResponse    = new ResponseSuccess();
-                $objResult      = new ResponseData();
-                $objResult->setData($varReturn);
-                $objResponse->setResult($objResult);
+        if ($varReturn !== null)
+        {
+            $this->varValue = $arrUuids;
+            $objResponse    = new ResponseSuccess();
+            $objResult      = new ResponseData();
+            $objResult->setData($varReturn);
+            $objResponse->setResult($objResult);
 
-                return $objResponse;
-            }
+            return $objResponse;
         }
     }
 
@@ -381,6 +399,37 @@ class FormMultiFileUpload extends \Upload
     }
 
     /**
+     * Validate a given extension
+     *
+     * @param UploadedFile $objUploadFile The uploaded file object
+     *
+     * @return string|boolean The error message or false for no error
+     */
+    protected function validateExtension(UploadedFile $objUploadFile)
+    {
+        $error = false;
+
+        $strAllowed = $this->extensions ?: \Config::get('uploadTypes');
+
+        $arrAllowed = trimsplit(',', $strAllowed);
+
+        $strExtension = $objUploadFile->getClientOriginalExtension();
+
+        if (!$strExtension || !is_array($arrAllowed) || !in_array($strExtension, $arrAllowed))
+        {
+            return sprintf(sprintf($GLOBALS['TL_LANG']['ERR']['illegalFileExtension'], $strExtension));
+        }
+
+        // compare client mime type with mime type check result from server (e.g. user uploaded a php file with jpg extension)
+        if ($objUploadFile->getClientMimeType() !== $objUploadFile->getMimeType())
+        {
+            return sprintf(sprintf($GLOBALS['TL_LANG']['ERR']['illegalMimeType'], $objUploadFile->getMimeType()));
+        }
+
+        return $error;
+    }
+
+    /**
      * Validate the uploaded file
      *
      * @param \File $objFile
@@ -426,102 +475,146 @@ class FormMultiFileUpload extends \Upload
     /**
      * Upload a file, store to $strUploadFolder and create database entry
      *
-     * @param $arrFile         The $_FILES array
-     * @param $strUploadFolder The upload target folder within contao files folder
+     * @param $objUploadFile         UploadedFile        The uploaded file object
+     * @param $strUploadFolder       The upload target folder within contao files folder
      * @param $strField
      *
      * @return array|bool Returns array with file information on success. Returns false if no valid file, file cannot be moved or destination lies outside the
      *                    contao upload directory.
      */
-    protected function uploadFile($arrFile, $strUploadFolder, $strField)
+    protected function uploadFile($objUploadFile, $strUploadFolder, $strField)
     {
-        if (!$arrFile['error'])
+        $strOriginalFileName        = rawurldecode($objUploadFile->getClientOriginalName()); // e.g. double quotes are escaped with %22 -> decode it
+        $strOriginalFileNameEncoded = rawurlencode($strOriginalFileName);
+        $strSanitizedFileName       = Files::sanitizeFileName($objUploadFile->getClientOriginalName());
+
+        if ($objUploadFile->getError())
         {
-            $error       = false;
-            $strTempFile = $arrFile['tmp_name'];
-
-            $arrPath = pathinfo($arrFile['name']);
-
-            $strTargetFileName = Files::addUniqIdToFilename(Files::sanitizeFileName($arrFile['name']), static::UNIQID_PREFIX);
-            $strTargetFile     = $strUploadFolder . '/' . $strTargetFileName;
-
-            if (!move_uploaded_file($strTempFile, TL_ROOT . '/' . $strTargetFile))
-            {
-                $error = &$GLOBALS['TL_LANG']['ERR']['moveUploadFile'];
-            }
-
-            $arrData = [
-                'filename'     => $strTargetFileName,
-                'filenameOrig' => $arrFile['name'],
+            return [
+                'error'               => $objUploadFile->getError(),
+                'filenameOrigEncoded' => $strOriginalFileNameEncoded,
+                'filenameSanitized'   => $strSanitizedFileName,
             ];
+        }
 
-            if (!$error)
+        $error = false;
+
+        $strTargetFileName = Files::addUniqIdToFilename($strSanitizedFileName, static::UNIQID_PREFIX);
+
+        if (($error = $this->validateExtension($objUploadFile)) !== false)
+        {
+            return [
+                'error'               => $error,
+                'filenameOrigEncoded' => $strOriginalFileNameEncoded,
+                'filenameSanitized'   => $strSanitizedFileName,
+            ];
+        }
+
+        try
+        {
+            $objUploadFile = $objUploadFile->move(TL_ROOT . '/' . $strUploadFolder, $strTargetFileName);
+        } catch (FileException $e)
+        {
+            return [
+                'error'               => sprintf($GLOBALS['TL_LANG']['ERR']['moveUploadFile'], $e->getMessage()),
+                'filenameOrigEncoded' => $strOriginalFileNameEncoded,
+                'filenameSanitized'   => $strSanitizedFileName,
+            ];
+        }
+
+        $arrData = [
+            'filename'            => $strTargetFileName,
+            'filenameOrigEncoded' => $strOriginalFileNameEncoded,
+            'filenameSanitized'   => $strSanitizedFileName,
+        ];
+
+        $strRelativePath = ltrim(str_replace(TL_ROOT, '', $objUploadFile->getRealPath()), DIRECTORY_SEPARATOR);
+
+        $objFile  = null;
+        $objModel = null;
+
+        try
+        {
+            // add db record
+            $objFile = new \File($strRelativePath);
+            $objFile->close();
+            $objModel = $objFile->getModel();
+            $strUuid  = $objFile->getModel()->uuid;
+        } catch (\InvalidArgumentException $e)
+        {
+            // remove file from file system
+            @unlink(TL_ROOT . '/' . $strRelativePath);
+
+            return [
+                'error'               => $GLOBALS['TL_LANG']['ERR']['outsideUploadDirectory'],
+                'filenameOrigEncoded' => $strOriginalFileNameEncoded,
+                'filenameSanitized'   => $strSanitizedFileName,
+            ];
+        }
+
+        if (!$objFile instanceof \File || $objModel === null)
+        {
+            // remove file from file system
+            @unlink(TL_ROOT . '/' . $strRelativePath);
+
+            return [
+                'error'               => $GLOBALS['TL_LANG']['ERR']['outsideUploadDirectory'],
+                'filenameOrigEncoded' => $strOriginalFileNameEncoded,
+                'filenameSanitized'   => $strSanitizedFileName,
+            ];
+        }
+
+        if (($error = $this->validateUpload($objFile)) !== false)
+        {
+            return [
+                'error'               => $error,
+                'filenameOrigEncoded' => $strOriginalFileNameEncoded,
+                'filenameSanitized'   => $strSanitizedFileName,
+            ];
+        }
+
+        // upload_path_callback
+        if (is_array($this->validate_upload_callback))
+        {
+            foreach ($this->validate_upload_callback as $callback)
             {
-                try
+                if (!class_exists($callback[0]))
                 {
-                    // add db record
-                    $objFile = new \File($strTargetFile);
-                    $objFile->close();
-                    $strUuid = $objFile->getModel()->uuid;
-                } catch (\InvalidArgumentException $e)
+                    continue;
+                }
+
+                $objCallback = \System::importStatic($callback[0]);
+
+                if (!method_exists($objCallback, $callback[1]))
                 {
-                    $error = &$GLOBALS['TL_LANG']['ERR']['outsideUploadDirectory'];
+                    continue;
+                }
+
+                if ($errorCallback = $objCallback->{$callback[1]}($objFile, $this))
+                {
+                    $error = $errorCallback;
+                    break; // stop validation on first error
                 }
             }
-
-            if (!$error && $objFile instanceof \File)
-            {
-                $error = $this->validateUpload($objFile);
-
-                // upload_path_callback
-                if (is_array($this->validate_upload_callback))
-                {
-                    foreach ($this->validate_upload_callback as $callback)
-                    {
-                        if (!class_exists($callback[0]))
-                        {
-                            continue;
-                        }
-
-                        $objCallback = \System::importStatic($callback[0]);
-
-                        if (!method_exists($objCallback, $callback[1]))
-                        {
-                            continue;
-                        }
-
-                        if ($errorCallback = $objCallback->{$callback[1]}($objFile, $this))
-                        {
-                            $error = $errorCallback;
-                            break; // stop validation on first error
-                        }
-                    }
-                }
-            }
+        }
 
 
-            if ($error === false && ($arrInfo = $this->objUploader->prepareFile($strUuid)) !== false)
-            {
-                $arrData = array_merge($arrData, $arrInfo);
-
-                return $arrData;
-            }
-
-            $arrData['error'] = $error;
-
-            // remove invalid files from tmp folder
-            if ($objFile instanceof \File)
-            {
-                $objFile->delete();
-            }
+        if ($error === false && ($arrInfo = $this->objUploader->prepareFile($strUuid)) !== false)
+        {
+            $arrData = array_merge($arrData, $arrInfo);
 
             return $arrData;
         }
 
-        return [
-            'error'        => $arrFile['error'],
-            'filenameOrig' => $arrFile['name'],
-        ];
+        $arrData['error'] = $error;
+
+        // remove invalid files from tmp folder
+        if ($objFile instanceof \File)
+        {
+            $objFile->delete();
+        }
+
+        return $arrData;
     }
 
     public function getUploader()

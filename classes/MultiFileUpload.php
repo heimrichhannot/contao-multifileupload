@@ -37,6 +37,9 @@ class MultiFileUpload extends \FileUpload
 
     const SESSION_ALLOWED_DOWNLOADS = 'multifileupload_allowed_downloads';
 
+    // prevent disk flooding violation
+    const MAX_FILES_DEFAULT = 10;
+
     /**
      * Has current page in xhtml type.
      *
@@ -198,7 +201,7 @@ class MultiFileUpload extends \FileUpload
         $this->previewsContainer = '#ctrl_' . $this->id . ' .dropzone-previews';
 
         $this->uploadMultiple = ($this->fieldType == 'checkbox');
-        $this->maxFiles       = ($this->uploadMultiple ? ($this->maxFiles ?: null) : 1);
+        $this->maxFiles       = ($this->uploadMultiple ? ($this->maxFiles ?: static::MAX_FILES_DEFAULT) : 1);
     }
 
     /**
@@ -308,9 +311,9 @@ class MultiFileUpload extends \FileUpload
             case 'url':
             case 'uploadAction':
             case 'uploadActionParams':
+            case 'parallelUploads':
             case 'method':
             case 'withCredentials':
-            case 'parallelUploads':
             case 'maxFiles':
             case 'uploadMultiple':
             case 'maxFilesize':
@@ -528,6 +531,13 @@ class MultiFileUpload extends \FileUpload
         return parent::__get($strKey);
     }
 
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->arrData;
+    }
 
     /**
      * Check whether a property is set

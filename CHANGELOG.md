@@ -1,6 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.21] - 2017-04-10
+
+### Added
+- file upload unit tests added
+
+### Fixed
+- security issues fixed
+
+### Changed
+- due to ajax token handling now only 1 `parallelUploads` is possible within one upload request 
+
 ## [1.1.20] - 2017-03-09
 
 ### Added

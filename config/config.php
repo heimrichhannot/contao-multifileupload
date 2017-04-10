@@ -24,8 +24,7 @@ $GLOBALS['BE_FFL']['multifileupload'] = 'HeimrichHannot\MultiFileUpload\Widget\B
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePostActions']['multifileupload'] =
-    ['HeimrichHannot\MultiFileUpload\Widget\BackendMultiFileUpload', 'executePostActionsHook'];
+$GLOBALS['TL_HOOKS']['executePostActions']['multifileupload'] = ['HeimrichHannot\MultiFileUpload\Widget\BackendMultiFileUpload', 'executePostActionsHook'];
 
 /**
  * Ajax action
@@ -33,8 +32,9 @@ $GLOBALS['TL_HOOKS']['executePostActions']['multifileupload'] =
 $GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = [
     'actions' => [
         \HeimrichHannot\MultiFileUpload\MultiFileUpload::ACTION_UPLOAD => [
-            'arguments' => [],
-            'optional'  => [],
+            'arguments'       => [],
+            'optional'        => [],
+            'csrf_protection' => true, // cross-site request forgery (ajax token check)
         ],
     ],
 ];
@@ -42,9 +42,9 @@ $GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = [
 /**
  * Assets (add dropzone not within contao files manager)
  */
-if(TL_MODE == 'FE')
+if (TL_MODE == 'FE')
 {
-    if(\Config::get('enableMultiFileUploadFrontendStyles'))
+    if (\Config::get('enableMultiFileUploadFrontendStyles'))
     {
         $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.css';
     }
@@ -53,7 +53,7 @@ if(TL_MODE == 'FE')
     $GLOBALS['TL_JAVASCRIPT']['multifileupload'] = 'system/modules/multifileupload/assets/js/multifileupload.min.js';
 }
 
-if(TL_MODE == 'BE' && \Input::get('do') != 'files')
+if (TL_MODE == 'BE' && \Input::get('do') != 'files')
 {
     $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.css';
 

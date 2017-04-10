@@ -21,8 +21,10 @@ $GLOBALS['TL_LANG']['MSC']['dropzone']['messages'] = [
     'dictMaxFilesExceeded'         => 'Sie können nicht noch mehr Dateien hochladen.'
 ];
 
+$GLOBALS['TL_LANG']['ERR']['illegalMimeType'] = 'Unerlaubter Dateityp: %s';
+$GLOBALS['TL_LANG']['ERR']['illegalFileExtension'] = 'Unerlaubte Dateiendung: %s';
 $GLOBALS['TL_LANG']['ERR']['invalidUuid'] = 'Der Datei wurde kein eindeutiger Kennzeichner (uuid) zugewiesen, bitte versuchen Sie die Datei erneut hochzuladen.';
-$GLOBALS['TL_LANG']['ERR']['moveUploadFile'] = 'Ungültige Datei oder Fehler beim Verschieben der Datei (Berechtigungen des Speicherziels prüfen).';
+$GLOBALS['TL_LANG']['ERR']['moveUploadFile'] = 'Ungültige Datei oder Fehler beim Verschieben der Datei (Berechtigungen des Speicherziels prüfen, Fehlermeldung: %s).';
 $GLOBALS['TL_LANG']['ERR']['outsideUploadDirectory'] = 'Speicherziel liegt außerhalb des Contao-Upload-Verzeichnisses.';
 $GLOBALS['TL_LANG']['ERR']['uploadNoUploadFolderDeclared'] = 'Kein gültiger "uploadFolder" für das Feld "%s" in eval angegeben, die Dateien wurden aus dem Verzeichnis "%s" nicht verschoben.';
 $GLOBALS['TL_LANG']['ERR']['noUploadFolderDeclared'] = 'Kein "uploadFolder" für das Feld "%s" in eval angegeben.';
