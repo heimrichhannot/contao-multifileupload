@@ -1,6 +1,7 @@
 <?php // in backend mode labels will be generated different (H3) ?>
 <?php if(TL_MODE == 'FE'): ?>
     <?php $this->extend('form_row'); ?>
+    <?php if(!in_array('bootstrapper', \ModuleLoader::getActive())): ?>
     <?php $this->block('label'); ?>
         <?php if ($this->label && !$this->hideLabel): ?>
             <label style="font-weight: bold;" for="ctrl_<?php echo $this->id; ?>"<?php if ($this->class): ?> class="<?php echo $this->class; ?>"<?php endif; ?>>
@@ -12,6 +13,7 @@
             </label>
         <?php endif; ?>
     <?php $this->endblock(); ?>
+    <?php endif; ?>
 <?php endif; ?>
 <?php $this->block('field'); ?>
     <div <?= $this->attributes; ?> class="multifileupload dropzone<?= $this->class ? ' ' . $this->class : ''; ?>" id="ctrl_<?= $this->id; ?>">
@@ -35,13 +37,15 @@
             <div class="dropzone-previews"></div>
         </div>
     </div>
-    <?php if ($this->explanation): ?>
-        <div class="explanation">
-            <?= $this->explanation ?>
-        </div>
-    <?php endif; ?>
-    <?php if ($this->widget->hasErrors()): ?>
-        <p class="error"><?= $this->widget->getErrorAsString() ?></p>
+    <?php if(!in_array('bootstrapper', \ModuleLoader::getActive())): ?>
+        <?php if ($this->explanation): ?>
+            <div class="explanation">
+                <?= $this->explanation ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($this->widget->hasErrors()): ?>
+            <p class="error"><?= $this->widget->getErrorAsString() ?></p>
+        <?php endif; ?>
     <?php endif; ?>
 
 <?php $this->endblock(); ?>

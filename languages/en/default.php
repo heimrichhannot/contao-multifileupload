@@ -21,14 +21,14 @@ $GLOBALS['TL_LANG']['MSC']['dropzone']['messages'] = [
     'dictMaxFilesExceeded'         => 'You can not upload any more files.',
 ];
 
-$GLOBALS['TL_LANG']['ERR']['illegalMimeType'] = 'Illegal mime type: %s';
-$GLOBALS['TL_LANG']['ERR']['illegalFileExtension'] = 'Illegal file extension: %s';
-$GLOBALS['TL_LANG']['ERR']['invalidUuid'] = 'No unique identifier (uuid) has been assigned to the file, please try to upload the file again.';
-$GLOBALS['TL_LANG']['ERR']['moveUploadFile'] = 'Invalid file or error on moving files, check permissions or upload destination.';
-$GLOBALS['TL_LANG']['ERR']['outsideUploadDirectory'] = 'Upload destination lies outside the contao upload directory.';
+$GLOBALS['TL_LANG']['ERR']['illegalMimeType']              = 'Illegal mime type: %s';
+$GLOBALS['TL_LANG']['ERR']['illegalFileExtension']         = 'Illegal file extension: %s';
+$GLOBALS['TL_LANG']['ERR']['invalidUuid']                  = 'No unique identifier (uuid) has been assigned to the file, please try to upload the file again.';
+$GLOBALS['TL_LANG']['ERR']['moveUploadFile']               = 'Invalid file or error on moving files, check permissions or upload destination.';
+$GLOBALS['TL_LANG']['ERR']['outsideUploadDirectory']       = 'Upload destination lies outside the contao upload directory.';
 $GLOBALS['TL_LANG']['ERR']['uploadNoUploadFolderDeclared'] = 'No valid "uploadFolder" in eval for field "%s" declared, files were not moved from "%s".';
-$GLOBALS['TL_LANG']['ERR']['noUploadFolderDeclared'] = 'No "uploadFolder" in eval for field "%s" declared.';
-$GLOBALS['TL_LANG']['ERR']['minWidth'] = 'The width of the image must not be less than %s pixel (current image width: %s pixel).';
-$GLOBALS['TL_LANG']['ERR']['minHeight'] = 'The height of the image must not be less than %s pixel (current image width: %s pixel).';
-$GLOBALS['TL_LANG']['ERR']['maxWidth'] = 'The width of the image must not exceed %s pixel (current image width: %s pixel).';
-$GLOBALS['TL_LANG']['ERR']['maxHeight'] = 'The height of the image must not exceed %s pixel (current image width: %s pixel).';
+$GLOBALS['TL_LANG']['ERR']['noUploadFolderDeclared']       = 'No "uploadFolder" in eval for field "%s" declared.';
+$GLOBALS['TL_LANG']['ERR']['minWidth']                     = 'The width of the image must not be less than %s pixel (current image width: %s pixel).';
+$GLOBALS['TL_LANG']['ERR']['minHeight']                    = 'The height of the image must not be less than %s pixel (current image width: %s pixel).';
+$GLOBALS['TL_LANG']['ERR']['maxWidth']                     = 'The width of the image must not exceed %s pixel (current image width: %s pixel).';
+$GLOBALS['TL_LANG']['ERR']['maxHeight']                    = 'The height of the image must not exceed %s pixel (current image width: %s pixel).';

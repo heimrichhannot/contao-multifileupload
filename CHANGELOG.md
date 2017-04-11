@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.23] - 2017-04-11
+
+### Fixed
+- frontend info url/download link (removal of all query parameters from url was not correct)
+- `form_multifileupload_dropzone.html5` renders label, explanation and error only if `heimrichhannot/contao-bootstrapper` is not active
+
 ## [1.1.22] - 2017-04-10
 
 ### Fixed

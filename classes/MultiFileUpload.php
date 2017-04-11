@@ -12,6 +12,7 @@
 
 namespace HeimrichHannot\MultiFileUpload;
 
+use HeimrichHannot\Ajax\AjaxAction;
 use HeimrichHannot\Haste\Util\Files;
 use HeimrichHannot\Haste\Util\StringUtil;
 use HeimrichHannot\Haste\Util\Url;
@@ -408,8 +409,8 @@ class MultiFileUpload extends \FileUpload
         {
             case 'FE':
 
-                $strHref = Url::getCurrentUrlWithoutParameters();
-                $strHref .= ((\Config::get('disableAlias') || strpos($strHref, '?') !== false) ? '&amp;' : '?') . 'file=' . \System::urlEncode($objFile->value);
+                $strHref = AjaxAction::removeAjaxParametersFromUrl(\Environment::get('uri'));
+                $strHref .= ((\Config::get('disableAlias') || strpos($strHref, '?') !== false) ? '&' : '?') . 'file=' . \System::urlEncode($objFile->value);
 
                 return 'window.open("' . $strHref . '", "_blank");';
 
