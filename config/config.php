@@ -13,7 +13,10 @@
 /**
  *  Default config
  */
-$GLOBALS['TL_CONFIG']['enableMultiFileUploadFrontendStyles'] = true;
+if(!isset($GLOBALS['TL_CONFIG']['enableMultiFileUploadFrontendStyles']))
+{
+    $GLOBALS['TL_CONFIG']['enableMultiFileUploadFrontendStyles'] = true;
+}
 
 /**
  * Front end form fields
