@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.25] - 2017-05-04
+
+### Fixed
+- 'text/csv' was detected as 'text/plain' by finfo() -> allow safe mimetypes
+
 ## [1.1.24] - 2017-04-12
 
 ### Fixed

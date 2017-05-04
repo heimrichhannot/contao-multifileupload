@@ -421,12 +421,36 @@ class FormMultiFileUpload extends \Upload
         }
 
         // compare client mime type with mime type check result from server (e.g. user uploaded a php file with jpg extension)
-        if ($objUploadFile->getClientMimeType() !== $objUploadFile->getMimeType())
+        if (!$this->validateMimeType($objUploadFile->getClientMimeType(), $objUploadFile->getMimeType()))
         {
             return sprintf(sprintf($GLOBALS['TL_LANG']['ERR']['illegalMimeType'], $objUploadFile->getMimeType()));
         }
 
         return $error;
+    }
+
+    protected function validateMimeType($mimeClient, $mimeDetected)
+    {
+        if ($mimeClient !== $mimeDetected)
+        {
+            // allow safe mime types
+            switch ($mimeDetected)
+            {
+                // csv files might be detected as the following instead of 'text/csv'
+                case 'text/plain':
+                case 'text/csv':
+                case 'text/x-csv':
+                case 'text/comma-separated-values':
+                case 'text/x-comma-separated-values':
+                case 'text/tab-separated-values':
+                    return true;
+                    break;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     /**

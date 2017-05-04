@@ -424,6 +424,56 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function testUploadCSVFile()
+    {
+        $objRequest =
+            \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
+        $objRequest->headers->set('X-Requested-With', 'XMLHttpRequest'); // xhr request
+        $objRequest->request->set('requestToken', \RequestToken::get());
+        $objRequest->request->set('files', []);
+
+        // prevent test file removal
+        @copy(UNIT_TESTING_FILES . '/data.csv', UNIT_TESTING_FILES . '/tmp/data.csv');
+
+        // simulate upload of php file hidden in an image file
+        $file = new UploadedFile(
+        // Path to the file to send
+            UNIT_TESTING_FILES . '/tmp/data.csv', // Name of the sent file
+            'data.csv', // mime type
+            'text/csv', // size of the file
+            7006, null, true
+        );
+
+        $objRequest->files->add(['files' => $file]);
+
+        Request::set($objRequest);
+
+        $arrDca = [
+            'inputType' => 'multifileupload',
+            'eval'      => [
+                'uploadFolder' => UNIT_TESTING_FILES . 'uploads/',
+                'extensions'   => 'csv',
+            ],
+        ];
+
+        $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
+
+        try
+        {
+            $objUploader = new FormMultiFileUpload($arrAttributes);
+            // unreachable code: if no exception is thrown after form was created, something went wrong
+            $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
+        } catch (AjaxExitException $e)
+        {
+            $objJson = json_decode($e->getMessage());
+
+            $this->assertNull($objJson->result->data->error);
+        }
+    }
+
+    /**
+     * @test
+     */
     public function testMaliciousFileUploadOfDisguisedPhpFile()
     {
         $objRequest =
