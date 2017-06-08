@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.26] - 2017-06-08
+
+### Fixed
+- 'text/css' was detected as 'text/x-asm'
+
 ## [1.1.25] - 2017-05-04
 
 ### Fixed

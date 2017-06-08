@@ -436,6 +436,8 @@ class FormMultiFileUpload extends \Upload
             // allow safe mime types
             switch ($mimeDetected)
             {
+                // css files might be detected as the following instead of 'text/css'
+                case 'text/x-asm':
                 // csv files might be detected as the following instead of 'text/csv'
                 case 'text/plain':
                 case 'text/csv':
