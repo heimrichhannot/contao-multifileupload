@@ -1,45 +1,45 @@
 {
-  "name": "heimrichhannot/contao-multifileupload",
-  "description": "Contao front end widget that provides dropzonejs.com functionality.",
-  "keywords": [
-    "contao",
-    "multi",
-    "file",
-    "upload",
-    "dropzone",
-    "widget"
-  ],
-  "type": "contao-module",
-  "homepage": "https://github.com/heimrichhannot/contao-multifileupload",
-  "license": "LGPL-3.0+",
-  "authors": [
-    {
-      "name": "Heimrich & Hannot",
-      "email": "digitales@heimrich-hannot.de",
-      "homepage": "http://www.heimrich-hannot.de",
-      "role": "Developer"
+    "name": "heimrichhannot/contao-multifileupload",
+    "description": "Contao front end widget that provides dropzonejs.com functionality.",
+    "keywords": [
+        "contao",
+        "multi",
+        "file",
+        "upload",
+        "dropzone",
+        "widget"
+    ],
+    "type": "contao-module",
+    "homepage": "https://github.com/heimrichhannot/contao-multifileupload",
+    "license": "LGPL-3.0+",
+    "authors": [
+        {
+            "name": "Heimrich & Hannot",
+            "email": "digitales@heimrich-hannot.de",
+            "homepage": "http://www.heimrich-hannot.de",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/heimrichhannot/contao-multifileupload/issues"
+    },
+    "require": {
+        "php": "~5.4 || ~7.0",
+        "contao/core-bundle": "^3.5.1 || ~4.1",
+        "contao-community-alliance/composer-plugin": "~2.4 || ~3.0",
+        "heimrichhannot/contao-ajax": "^1.1.3",
+        "heimrichhannot/dropzone4": "^4.3"
+    },
+    "autoload": {
+        "classmap": [
+            ""
+        ]
+    },
+    "extra": {
+        "contao": {
+            "sources": {
+                "": "system/modules/multifileupload"
+            }
+        }
     }
-  ],
-  "support": {
-    "issues": "https://github.com/heimrichhannot/contao-multifileupload/issues"
-  },
-  "require": {
-    "php": "~5.4 || ~7.0",
-    "contao/core-bundle": "^3.5.1 || ~4.1",
-    "contao-community-alliance/composer-plugin": "~2.4 || ~3.0",
-    "heimrichhannot/contao-ajax": "^1.1.3",
-    "enyo/dropzone": "^4.3"
-  },
-  "autoload": {
-    "classmap": [
-      ""
-    ]
-  },
-  "extra": {
-    "contao": {
-      "sources": {
-        "": "system/modules/multifileupload"
-      }
-    }
-  }
 }

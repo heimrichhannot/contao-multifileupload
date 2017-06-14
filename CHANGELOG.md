@@ -1,5 +1,11 @@
-# Change Log
+# Changelog
 All notable changes to this project will be documented in this file.
+
+## [1.2.0] - 2017-06-14
+
+### Fixed
+- javascript paths
+- dropzone dep
 
 ## [1.1.26] - 2017-06-08
 

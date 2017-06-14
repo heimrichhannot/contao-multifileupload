@@ -47,19 +47,23 @@ $GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = [
  */
 if (TL_MODE == 'FE')
 {
+    $strBasePath = version_compare(VERSION, '4.0', '<') ? 'composer/vendor/enyo/dropzone' : 'assets/dropzone4';
+
     if (\Config::get('enableMultiFileUploadFrontendStyles'))
     {
         $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.css';
     }
 
-    $GLOBALS['TL_JAVASCRIPT']['dropzone']        = 'composer/vendor/enyo/dropzone/dist/min/dropzone.min.js';
+    $GLOBALS['TL_JAVASCRIPT']['dropzone']        = $strBasePath . '/dist/min/dropzone.min.js';
     $GLOBALS['TL_JAVASCRIPT']['multifileupload'] = 'system/modules/multifileupload/assets/js/multifileupload.min.js';
 }
 
 if (TL_MODE == 'BE' && \Input::get('do') != 'files')
 {
+    $strBasePath = version_compare(VERSION, '4.0', '<') ? 'composer/vendor/enyo/dropzone' : 'assets/dropzone4';
+
     $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.css';
 
-    $GLOBALS['TL_JAVASCRIPT']['dropzone']        = 'composer/vendor/enyo/dropzone/dist/min/dropzone.min.js';
+    $GLOBALS['TL_JAVASCRIPT']['dropzone']        = $strBasePath . '/dist/min/dropzone.min.js';
     $GLOBALS['TL_JAVASCRIPT']['multifileupload'] = 'system/modules/multifileupload/assets/js/multifileupload.min.js';
 }
