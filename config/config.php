@@ -47,7 +47,7 @@ $GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = [
  */
 if (TL_MODE == 'FE')
 {
-    $strBasePath = version_compare(VERSION, '4.0', '<') ? 'composer/vendor/enyo/dropzone' : 'assets/dropzone4';
+    $strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
 
     if (\Config::get('enableMultiFileUploadFrontendStyles'))
     {
@@ -60,7 +60,7 @@ if (TL_MODE == 'FE')
 
 if (TL_MODE == 'BE' && \Input::get('do') != 'files')
 {
-    $strBasePath = version_compare(VERSION, '4.0', '<') ? 'composer/vendor/enyo/dropzone' : 'assets/dropzone4';
+    $strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
 
     $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.css';
 

@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2017-06-26
+
+### Fixed
+- fixed deps
+
 ## [1.2.0] - 2017-06-14
 
 ### Fixed
