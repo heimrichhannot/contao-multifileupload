@@ -1,20 +1,17 @@
+<?php $this->extend('form_row'); ?>
+<?php $this->block('label'); ?>
 <?php // in backend mode labels will be generated different (H3) ?>
-<?php if(TL_MODE == 'FE'): ?>
-    <?php $this->extend('form_row'); ?>
-    <?php if(!in_array('bootstrapper', \ModuleLoader::getActive())): ?>
-    <?php $this->block('label'); ?>
-        <?php if ($this->label && !$this->hideLabel): ?>
-            <label style="font-weight: bold;" for="ctrl_<?php echo $this->id; ?>"<?php if ($this->class): ?> class="<?php echo $this->class; ?>"<?php endif; ?>>
-                <?php if ($this->mandatory): ?>
-                    <span class="invisible"><?php echo $this->mandatoryField; ?></span> <?php echo $this->label; ?><span class="mandatory">*</span>
-                <?php else: ?>
-                    <?php echo $this->label; ?>
-                <?php endif; ?>
-            </label>
+<?php if ($this->label && !$this->hideLabel && TL_MODE == 'FE'): ?>
+    <label style="font-weight: bold;" for="ctrl_<?php echo $this->id; ?>"<?php if ($this->class): ?> class="<?php echo $this->class; ?>"<?php endif; ?>>
+        <?php if ($this->mandatory): ?>
+            <span class="invisible"><?php echo $this->mandatoryField; ?></span> <?php echo $this->label; ?><span class="mandatory">*</span>
+        <?php else: ?>
+            <?php echo $this->label; ?>
         <?php endif; ?>
-    <?php $this->endblock(); ?>
-    <?php endif; ?>
+    </label>
 <?php endif; ?>
+<?php $this->endblock(); ?>
+
 <?php $this->block('field'); ?>
     <div <?= $this->attributes; ?> class="multifileupload dropzone<?= $this->class ? ' ' . $this->class : ''; ?>" id="ctrl_<?= $this->id; ?>">
         <input type="hidden" name="formattedInitial_<?= $this->id ?>" value='<?= $this->initialFilesFormatted ?: '[]' ?>'>
