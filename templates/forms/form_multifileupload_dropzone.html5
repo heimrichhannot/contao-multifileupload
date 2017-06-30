@@ -1,7 +1,7 @@
 <?php $this->extend('form_row'); ?>
 <?php $this->block('label'); ?>
 <?php // in backend mode labels will be generated different (H3) ?>
-<?php if ($this->label && !$this->hideLabel && TL_MODE == 'FE'): ?>
+<?php if ($this->label && !$this->hideLabel && TL_MODE == 'FE' && !in_array('bootstrapper', \ModuleLoader::getActive())): ?>
     <label style="font-weight: bold;" for="ctrl_<?php echo $this->id; ?>"<?php if ($this->class): ?> class="<?php echo $this->class; ?>"<?php endif; ?>>
         <?php if ($this->mandatory): ?>
             <span class="invisible"><?php echo $this->mandatoryField; ?></span> <?php echo $this->label; ?><span class="mandatory">*</span>
