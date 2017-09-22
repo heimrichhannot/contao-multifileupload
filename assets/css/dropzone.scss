@@ -119,8 +119,8 @@
     }
   }
 
-  min-height: $min-height;
-  border: 1px solid $border-color;
+  min-height: $min-height !important;
+  border: 1px solid $border-color !important;
   background: white;
   padding: 5px;
   position: relative;
