@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.2.2] - 2017-09-22
+## [1.2.4] - 2017-09-22
 
 ### Fixed 
 * dropzone display error in contao 4
