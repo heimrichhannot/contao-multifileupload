@@ -11,14 +11,6 @@
 
 
 /**
- *  Default config
- */
-if(!isset($GLOBALS['TL_CONFIG']['enableMultiFileUploadFrontendStyles']))
-{
-    $GLOBALS['TL_CONFIG']['enableMultiFileUploadFrontendStyles'] = true;
-}
-
-/**
  * Front end form fields
  */
 $GLOBALS['TL_FFL']['multifileupload'] = 'HeimrichHannot\MultiFileUpload\FormMultiFileUpload';
@@ -45,25 +37,33 @@ $GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = [
 /**
  * Assets (add dropzone not within contao files manager)
  */
-if (TL_MODE == 'FE')
-{
+if (TL_MODE == 'FE') {
     $strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
 
-    if (\Config::get('enableMultiFileUploadFrontendStyles'))
-    {
-        $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.css';
-    }
+    $GLOBALS['TL_COMPONENTS']['multifileupload.js'] = [
+        'js' => [
+            'files' => [
+                $strBasePath . '/dist/min/dropzone.min.js|static',
+                'system/modules/multifileupload/assets/js/multifileupload.min.js|static'
+            ],
+        ],
+    ];
 
-    $GLOBALS['TL_JAVASCRIPT']['dropzone']        = $strBasePath . '/dist/min/dropzone.min.js';
-    $GLOBALS['TL_JAVASCRIPT']['multifileupload'] = 'system/modules/multifileupload/assets/js/multifileupload.min.js';
+    $GLOBALS['TL_COMPONENTS']['multifileupload.css'] = [
+        'css' => [
+            'files' => [
+                'system/modules/multifileupload/assets/css/dropzone.min.css|screen|static',
+            ],
+            'after' => 'multifileupload.js'
+        ],
+    ];
 }
 
-if (TL_MODE == 'BE' && \Input::get('do') != 'files')
-{
+if (TL_MODE == 'BE' && \Input::get('do') != 'files') {
     $strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
 
     $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.css';
 
-    $GLOBALS['TL_JAVASCRIPT']['dropzone']        = $strBasePath . '/dist/min/dropzone.min.js';
-    $GLOBALS['TL_JAVASCRIPT']['multifileupload'] = 'system/modules/multifileupload/assets/js/multifileupload.min.js';
+    $GLOBALS['TL_JAVASCRIPT']['dropzone']        = $strBasePath . '/dist/min/dropzone.min.js|static';
+    $GLOBALS['TL_JAVASCRIPT']['multifileupload'] = 'system/modules/multifileupload/assets/js/multifileupload.min.js|static';
 }

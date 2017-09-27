@@ -1,11 +1,25 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2017-09-27
+
+### Changed
+- frontend css and js is now invoked with `heimrichhannot/contao-components` (can be disabled within page layouts), removed `enableMultiFileUploadFrontendStyles` from tl_settings
+
 ## [1.2.4] - 2017-09-22
 
 ### Fixed 
 * dropzone display error in contao 4
 
+## [1.2.3] - 2017-06-30
+
+### Fixed 
+* front end: dont show dropzone label wihtin `form_multifileupload_dropzone.html5` if `heimrichhannot/contao-bootstrapper` module is active
+
+## [1.2.2] - 2017-06-29
+
+### Fixed 
+* label and error messages within front end
 
 ## [1.2.1] - 2017-06-26
 
