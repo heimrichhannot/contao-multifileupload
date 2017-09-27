@@ -37,27 +37,25 @@ $GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = [
 /**
  * Assets (add dropzone not within contao files manager)
  */
-if (TL_MODE == 'FE') {
-    $strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
+$strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
 
-    $GLOBALS['TL_COMPONENTS']['multifileupload.js'] = [
-        'js' => [
-            'files' => [
-                $strBasePath . '/dist/min/dropzone.min.js|static',
-                'system/modules/multifileupload/assets/js/multifileupload.min.js|static'
-            ],
+$GLOBALS['TL_COMPONENTS']['multifileupload.js'] = [
+    'js' => [
+        'files' => [
+            $strBasePath . '/dist/min/dropzone.min.js|static',
+            'system/modules/multifileupload/assets/js/multifileupload.min.js|static'
         ],
-    ];
+    ],
+];
 
-    $GLOBALS['TL_COMPONENTS']['multifileupload.css'] = [
-        'css' => [
-            'files' => [
-                'system/modules/multifileupload/assets/css/dropzone.min.css|screen|static',
-            ],
-            'after' => 'multifileupload.js'
+$GLOBALS['TL_COMPONENTS']['multifileupload.css'] = [
+    'css' => [
+        'files' => [
+            'system/modules/multifileupload/assets/css/dropzone.min.css|screen|static',
         ],
-    ];
-}
+        'after' => 'multifileupload.js'
+    ],
+];
 
 if (TL_MODE == 'BE' && \Input::get('do') != 'files') {
     $strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
