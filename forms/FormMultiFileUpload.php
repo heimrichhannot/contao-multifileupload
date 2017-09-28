@@ -207,7 +207,14 @@ class FormMultiFileUpload extends \Upload
                 if ($objFile->renameTo($strTarget))
                 {
                     $arrTargets[] = $strTarget;
-                    $objFile->close();
+                    $objModel = $objFile->getModel();
+
+                    // Update the database
+                    if ($objModel === null && \Dbafs::shouldBeSynchronized($strTarget))
+                    {
+                        $objModel = \Dbafs::addResource($strTarget);
+                    }
+
                     continue;
                 }
 
@@ -563,8 +570,14 @@ class FormMultiFileUpload extends \Upload
         {
             // add db record
             $objFile = new \File($strRelativePath);
-            $objFile->close();
             $objModel = $objFile->getModel();
+
+            // Update the database
+            if ($objModel === null && \Dbafs::shouldBeSynchronized($strRelativePath))
+            {
+                $objModel = \Dbafs::addResource($strRelativePath);
+            }
+
             $strUuid  = $objFile->getModel()->uuid;
         } catch (\InvalidArgumentException $e)
         {
