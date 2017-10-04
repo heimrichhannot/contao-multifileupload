@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2017-10-04
+
+### Fixed
+* popup route not working in contao 4
+
 ## [1.3.1] - 2017-09-28
 
 ### Fixed

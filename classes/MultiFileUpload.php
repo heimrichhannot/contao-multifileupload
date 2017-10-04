@@ -12,6 +12,7 @@
 
 namespace HeimrichHannot\MultiFileUpload;
 
+use Contao\System;
 use HeimrichHannot\Ajax\AjaxAction;
 use HeimrichHannot\Haste\Util\Files;
 use HeimrichHannot\Haste\Util\StringUtil;
@@ -418,8 +419,13 @@ class MultiFileUpload extends \FileUpload
             case 'BE':
                 $popupWidth  = 664;
                 $popupHeight = 299;
-                $href        = 'contao/popup.php?src=' . base64_encode($objFile->value);
 
+
+                $href = version_compare(VERSION, '4.0', '<=')
+                    ? 'contao/popup.php?src=' . base64_encode($objFile->value)
+                    : System::getContainer()->get('router')->generate('contao_backend_popup', [
+                        'src' => base64_encode($objFile->value)
+                    ]);
                 return 'Backend.openModalIframe({"width":"' . $popupWidth . '","title":"' . str_replace(
                         "'",
                         "\\'",
