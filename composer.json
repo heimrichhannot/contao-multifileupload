@@ -29,7 +29,7 @@
     "contao-community-alliance/composer-plugin": "~2.4 || ~3.0",
     "heimrichhannot/contao-ajax": "^1.1.3",
     "heimrichhannot/dropzone4": "^4.3",
-    "heimrichhannot/contao-components": "^1.1"
+    "heimrichhannot/contao-components": "^2.0"
   },
   "autoload": {
     "classmap": [

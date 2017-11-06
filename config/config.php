@@ -39,28 +39,26 @@ $GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = [
  */
 $strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
 
-$GLOBALS['TL_COMPONENTS']['multifileupload.js'] = [
-    'js' => [
-        'files' => [
-            $strBasePath . '/dist/min/dropzone.min.js|static',
-            'system/modules/multifileupload/assets/js/multifileupload.min.js|static'
-        ],
+$GLOBALS['TL_COMPONENTS']['multifileupload'] = [
+    'js'  => [
+        $strBasePath . '/dist/min/dropzone.min.js|static',
+        'system/modules/multifileupload/assets/js/multifileupload.min.js|static',
+    ],
+    'css' => [
+        'system/modules/multifileupload/assets/css/dropzone.min.css|screen|static',
     ],
 ];
 
-$GLOBALS['TL_COMPONENTS']['multifileupload.css'] = [
-    'css' => [
-        'files' => [
-            'system/modules/multifileupload/assets/css/dropzone.min.css|screen|static',
-        ],
-        'after' => 'multifileupload.js'
-    ],
-];
+if (TL_MODE == 'FE') {
+    $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.min.css|screen|static';
+
+    $GLOBALS['TL_JAVASCRIPT']['dropzone']        = $strBasePath . '/dist/min/dropzone.min.js|static';
+    $GLOBALS['TL_JAVASCRIPT']['multifileupload'] = 'system/modules/multifileupload/assets/js/multifileupload.min.js|static';
+}
 
 if (TL_MODE == 'BE' && \Input::get('do') != 'files') {
-    $strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
 
-    $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.css';
+    $GLOBALS['TL_CSS']['dropzone'] = 'system/modules/multifileupload/assets/css/dropzone.min.css|screen|static';
 
     $GLOBALS['TL_JAVASCRIPT']['dropzone']        = $strBasePath . '/dist/min/dropzone.min.js|static';
     $GLOBALS['TL_JAVASCRIPT']['multifileupload'] = 'system/modules/multifileupload/assets/js/multifileupload.min.js|static';
