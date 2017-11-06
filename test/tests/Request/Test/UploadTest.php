@@ -30,8 +30,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     {
         $strAction = AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD);
 
-        $objRequest =
-            \Symfony\Component\HttpFoundation\Request::create('http://localhost' . $strAction, 'post');
+        $objRequest = \Symfony\Component\HttpFoundation\Request::create('http://localhost' . $strAction, 'post');
         $objRequest->headers->set('X-Requested-With', 'XMLHttpRequest'); // xhr request
         $objRequest->request->set('requestToken', \RequestToken::get());
         $objRequest->request->set('files', []);
@@ -39,13 +38,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
         @copy(UNIT_TESTING_FILES . '/file   name.zip', UNIT_TESTING_FILES . '/tmp/file   name.zip');
 
         $arrFiles = [
-            new UploadedFile(
-            // Path to the file to send
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file   name.zip', // Name of the sent file
                 '"b<marquee onscroll=alert(1)>file   name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            )
+                48140, null, true),
         ];
 
         $objRequest->files->add(['files' => $arrFiles[0]]);
@@ -63,13 +60,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
-        try
-        {
+        try {
             $objUploader = new FormMultiFileUpload($arrAttributes);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
-        } catch (AjaxExitException $e)
-        {
+        } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
 
             $this->assertSame('bmarquee-onscrollalert1file-name.zip', $objJson->result->data->filenameSanitized);
@@ -87,8 +82,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
         $strAction = Url::removeQueryString([Ajax::AJAX_ATTR_TOKEN], $strAction);
         $strAction = Url::addQueryString(Ajax::AJAX_ATTR_TOKEN . '=' . 12355456, $strAction);
 
-        $objRequest =
-            \Symfony\Component\HttpFoundation\Request::create('http://localhost' . $strAction, 'post');
+        $objRequest = \Symfony\Component\HttpFoundation\Request::create('http://localhost' . $strAction, 'post');
         $objRequest->headers->set('X-Requested-With', 'XMLHttpRequest'); // xhr request
         $objRequest->request->set('requestToken', \RequestToken::get());
         $objRequest->request->set('files', []);
@@ -102,48 +96,36 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         // simulate upload of php file hidden in an image file
         $arrFiles = [
-            new UploadedFile(
-            // Path to the file to send
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file   name.zip', // Name of the sent file
                 'file   name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file---name.zip', // Name of the sent file
                 'file---name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file--.--.-.--name.zip', // Name of the sent file
                 'file--.--.-.--name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file...name..zip', // Name of the sent file
                 'file...name..zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file___name.zip', // Name of the sent file
                 'file___name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/.~file   name#%&*{}:<>?+|"\'.zip', // Name of the sent file
                 '.~file   name#%&*{}:<>?+|"\'.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
+                48140, null, true),
         ];
 
         $objRequest->files->add(['files' => $arrFiles]);
@@ -162,13 +144,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
-        try
-        {
+        try {
             $objUploader = new FormMultiFileUpload($arrAttributes);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
-        } catch (AjaxExitException $e)
-        {
+        } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
 
             $this->assertSame('Invalid ajax token.', $objJson->message);
@@ -182,8 +162,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
      */
     public function testDiskFlooding()
     {
-        $objRequest =
-            \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
+        $objRequest = \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
         $objRequest->headers->set('X-Requested-With', 'XMLHttpRequest'); // xhr request
         $objRequest->request->set('requestToken', \RequestToken::get());
         $objRequest->request->set('files', []);
@@ -197,48 +176,36 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         // simulate upload of php file hidden in an image file
         $arrFiles = [
-            new UploadedFile(
-            // Path to the file to send
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file   name.zip', // Name of the sent file
                 'file   name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file---name.zip', // Name of the sent file
                 'file---name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file--.--.-.--name.zip', // Name of the sent file
                 'file--.--.-.--name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file...name..zip', // Name of the sent file
                 'file...name..zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file___name.zip', // Name of the sent file
                 'file___name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/.~file   name#%&*{}:<>?+|"\'.zip', // Name of the sent file
                 '.~file   name#%&*{}:<>?+|"\'.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
+                48140, null, true),
         ];
 
         $objRequest->files->add(['files' => $arrFiles]);
@@ -257,13 +224,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
-        try
-        {
+        try {
             $objUploader = new FormMultiFileUpload($arrAttributes);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
-        } catch (AjaxExitException $e)
-        {
+        } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
 
             $this->assertSame('Bulk file upload violation.', $objJson->message);
@@ -275,8 +240,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
      */
     public function testSanitizeFileNames()
     {
-        $objRequest =
-            \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
+        $objRequest = \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
         $objRequest->headers->set('X-Requested-With', 'XMLHttpRequest'); // xhr request
         $objRequest->request->set('requestToken', \RequestToken::get());
         $objRequest->request->set('files', []);
@@ -292,48 +256,36 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         // simulate upload of php file hidden in an image file
         $arrFiles = [
-            new UploadedFile(
-            // Path to the file to send
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file   name.zip', // Name of the sent file
                 'file   name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file---name.zip', // Name of the sent file
                 'file---name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file--.--.-.--name.zip', // Name of the sent file
                 'file--.--.-.--name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file...name..zip', // Name of the sent file
                 'file...name..zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/file___name.zip', // Name of the sent file
                 'file___name.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
-            new UploadedFile(
-            // Path to the file to send
+                48140, null, true),
+            new UploadedFile(// Path to the file to send
                 UNIT_TESTING_FILES . '/tmp/.~file   name#%&*{}:<>?+|"\'.zip', // Name of the sent file
                 '.~file   name#%&*{}:<>?+|"\'.zip', // mime type
                 'application/zip', // size of the file
-                48140, null, true
-            ),
+                48140, null, true),
         ];
 
         $objRequest->files->add(['files' => $arrFiles]);
@@ -351,13 +303,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
-        try
-        {
+        try {
             $objUploader = new FormMultiFileUpload($arrAttributes);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
-        } catch (AjaxExitException $e)
-        {
+        } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
 
             $this->assertSame('file-name.zip', $objJson->result->data[0]->filenameSanitized);
@@ -374,8 +324,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
      */
     public function testMaliciousFileUploadOfInvalidCharactersInFileName()
     {
-        $objRequest =
-            \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
+        $objRequest = \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
         $objRequest->headers->set('X-Requested-With', 'XMLHttpRequest'); // xhr request
         $objRequest->request->set('requestToken', \RequestToken::get());
         $objRequest->request->set('files', []);
@@ -384,13 +333,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
         @copy(UNIT_TESTING_FILES . '/საბეჭდი_მანქანა.png', UNIT_TESTING_FILES . '/tmp/საბეჭდი_მანქანა.png');
 
         // simulate upload of php file hidden in an image file
-        $file = new UploadedFile(
-        // Path to the file to send
+        $file = new UploadedFile(// Path to the file to send
             UNIT_TESTING_FILES . '/tmp/საბეჭდი_მანქანა.png', // Name of the sent file
             'საბეჭდი_მანქანა.png', // mime type
             'image/png', // size of the file
-            64693, null, true
-        );
+            64693, null, true);
 
         $objRequest->files->add(['files' => $file]);
 
@@ -407,14 +354,12 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
-        try
-        {
+        try {
             $objUploader = new FormMultiFileUpload($arrAttributes);
             $objUploader->upload();
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
-        } catch (AjaxExitException $e)
-        {
+        } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
 
             $this->assertSame('sabejdi_mankhana.png', $objJson->result->data->filenameSanitized);
@@ -426,8 +371,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
      */
     public function testUploadCSVFile()
     {
-        $objRequest =
-            \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
+        $objRequest = \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
         $objRequest->headers->set('X-Requested-With', 'XMLHttpRequest'); // xhr request
         $objRequest->request->set('requestToken', \RequestToken::get());
         $objRequest->request->set('files', []);
@@ -436,13 +380,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
         @copy(UNIT_TESTING_FILES . '/data.csv', UNIT_TESTING_FILES . '/tmp/data.csv');
 
         // simulate upload of php file hidden in an image file
-        $file = new UploadedFile(
-        // Path to the file to send
+        $file = new UploadedFile(// Path to the file to send
             UNIT_TESTING_FILES . '/tmp/data.csv', // Name of the sent file
             'data.csv', // mime type
             'text/csv', // size of the file
-            7006, null, true
-        );
+            7006, null, true);
 
         $objRequest->files->add(['files' => $file]);
 
@@ -458,13 +400,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
-        try
-        {
+        try {
             $objUploader = new FormMultiFileUpload($arrAttributes);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
-        } catch (AjaxExitException $e)
-        {
+        } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
 
             $this->assertNull($objJson->result->data->error);
@@ -476,8 +416,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
      */
     public function testMaliciousFileUploadOfDisguisedPhpFile()
     {
-        $objRequest =
-            \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
+        $objRequest = \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
         $objRequest->headers->set('X-Requested-With', 'XMLHttpRequest'); // xhr request
         $objRequest->request->set('requestToken', \RequestToken::get());
         $objRequest->request->set('files', []);
@@ -486,13 +425,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
         @copy(UNIT_TESTING_FILES . '/cmd_test.php.jpg', UNIT_TESTING_FILES . '/tmp/cmd_test.php.jpg');
 
         // simulate upload of php file hidden in an image file
-        $file = new UploadedFile(
-        // Path to the file to send
+        $file = new UploadedFile(// Path to the file to send
             UNIT_TESTING_FILES . '/tmp/cmd_test.php.jpg', // Name of the sent file
             'cmd_test.php.jpg', // mime type
             'image/jpeg', // size of the file
-            652, null, true
-        );
+            652, null, true);
 
         $objRequest->files->add(['files' => $file]);
 
@@ -508,13 +445,11 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
-        try
-        {
+        try {
             $objUploader = new FormMultiFileUpload($arrAttributes);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
-        } catch (AjaxExitException $e)
-        {
+        } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
 
             $this->assertSame('Unerlaubter Dateityp: text/x-php', $objJson->result->data->error);
@@ -527,8 +462,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
      */
     public function testMaliciousFileUploadOfInvalidTypes()
     {
-        $objRequest =
-            \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
+        $objRequest = \Symfony\Component\HttpFoundation\Request::create('http://localhost' . AjaxAction::generateUrl(MultiFileUpload::NAME, MultiFileUpload::ACTION_UPLOAD), 'post');
         $objRequest->headers->set('X-Requested-With', 'XMLHttpRequest'); // xhr request
         $objRequest->request->set('requestToken', \RequestToken::get());
         $objRequest->request->set('files', []);
@@ -538,21 +472,17 @@ class UploadTest extends \PHPUnit_Framework_TestCase
         @copy(UNIT_TESTING_FILES . '/cmd_test.php', UNIT_TESTING_FILES . '/tmp/cmd_test.php');
         @copy(UNIT_TESTING_FILES . '/cmd_test1.php', UNIT_TESTING_FILES . '/tmp/cmd_test1.php');
 
-        $file = new UploadedFile(
-        // Path to the file to send
+        $file = new UploadedFile(// Path to the file to send
             UNIT_TESTING_FILES . '/tmp/cmd_test.php', // Name of the sent file
             'cmd_test.php', // mime type
             'text/x-php', // size of the file
-            652, null, true
-        );
+            652, null, true);
 
-        $file2 = new UploadedFile(
-        // Path to the file to send
+        $file2 = new UploadedFile(// Path to the file to send
             UNIT_TESTING_FILES . '/tmp/cmd_test1.php', // Name of the sent file
             'cmd_test1.php', // mime type
             'text/x-php', // size of the file
-            652, null, true
-        );
+            652, null, true);
 
         $objRequest->files->add(['files' => [$file, $file2]]);
 
@@ -569,14 +499,12 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
-        try
-        {
+        try {
             $objUploader = new FormMultiFileUpload($arrAttributes);
             $objUploader->upload();
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
-        } catch (AjaxExitException $e)
-        {
+        } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
 
             $this->assertSame('Unerlaubte Dateiendung: php', $objJson->result->data[0]->error);
@@ -589,7 +517,32 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+
+        $files = [
+            'საბეჭდი_მანქანა.png',
+            '.~file   name#%&*{}:<>?+|".zip',
+            'file___name.zip',
+            'file...name.zip',
+            'file name.zip',
+            'file--.--.-.--name.zip',
+            'file---name.zip',
+        ];
+
+        $this->createTestFiles($files);
+
         // reset request parameter bag
         Request::set(new \Symfony\Component\HttpFoundation\Request());
+    }
+
+    /**
+     * creates files for tests
+     *
+     * @param array $files
+     */
+    protected function createTestFiles(array $files)
+    {
+        foreach ($files as $file) {
+            $result = fopen(__DIR__ . '/../../../files/' . $file, 'c');
+        }
     }
 }

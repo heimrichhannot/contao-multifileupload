@@ -42,5 +42,10 @@
         "": "system/modules/multifileupload"
       }
     }
+  },
+  "archive": {
+    "exclude": [
+      "test/"
+    ]
   }
 }

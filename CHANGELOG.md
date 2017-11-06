@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.4] - 2017-11-06
+
+### Changed
+* generating test files with special names when running tests for the first time
+
 ## [1.3.3] - 2017-11-06
 
 ### Changed
