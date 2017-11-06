@@ -37,7 +37,7 @@ $GLOBALS['AJAX'][\HeimrichHannot\MultiFileUpload\MultiFileUpload::NAME] = [
 /**
  * Assets (add dropzone not within contao files manager)
  */
-$strBasePath = version_compare(VERSION, '4.0', '<') ? 'assets/components/dropzone4' : 'assets/dropzone4';
+$strBasePath = version_compare(VERSION, '5.0', '<') ? 'assets/components/dropzone' : 'assets/dropzone';
 
 $GLOBALS['TL_COMPONENTS']['multifileupload'] = [
     'js'  => [

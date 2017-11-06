@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2017-11-06
+
+### Changed
+* updated to dropzone 5
+
 ## [1.3.4] - 2017-11-06
 
 ### Changed
