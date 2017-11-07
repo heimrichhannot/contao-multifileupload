@@ -28,7 +28,7 @@
     "contao/core-bundle": "^3.5.1 || ~4.1",
     "contao-community-alliance/composer-plugin": "~2.4 || ~3.0",
     "heimrichhannot/contao-ajax": "^1.1.3",
-    "heimrichhannot/dropzone": "^5.2",
+    "heimrichhannot/dropzone-latest": "^5.0",
     "heimrichhannot/contao-components": "^2.0"
   },
   "autoload": {
