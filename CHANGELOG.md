@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.4] - 2017-11-07
+
+### Fixed 
+* more fixed due changed introduced in 1.4.2
+
 ## [1.4.3] - 2017-11-07
 
 ### Fixed 
