@@ -1,6 +1,31 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.2] - 2017-11-07
+
+### Changed 
+* renamed shim repository
+
+## [1.4.1] - 2017-11-07
+
+### Fixed 
+* used wrong version in version compare
+
+## [1.4.0] - 2017-11-06
+
+### Changed
+* updated to dropzone 5
+
+## [1.3.4] - 2017-11-06
+
+### Changed
+* generating test files with special names when running tests for the first time
+
+## [1.3.3] - 2017-11-06
+
+### Changed
+* updated config.php for contao-components 2.0
+
 ## [1.3.2] - 2017-10-04
 
 ### Fixed
