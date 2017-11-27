@@ -53,7 +53,7 @@ Name | Default | Description
 fieldType | 'checkbox' | If set to "checkbox", multiple files can be uploaded, for single upload set to 'radio'
 extensions | \Config::get('uploadTypes') | A comma separated list of allowed file types (e.g. "jpg,png")
 maxUploadSize | minimum of $GLOBALS['TL_CONFIG']['maxFileSize'] and php.ini 'upload_max_filesize' | The desired maximum upload size measured in Bytes (e.g. "100"), KiB, MiB or GiB (e.g. "10M"). Can not exceed $GLOBALS['TL_CONFIG']['maxFileSize'] or php upload_max_filesize value.
-maxFiles | infinite | The maximum file count per field
+maxFiles | 10 | The maximum file count per field
 uploadFolder | null | The upload folder as String, e.g. "files/uploads", function or array. **(must be declared !!!)**, required to move files to correct destination after submission.
 addRemoveLinks | true | Remove links are added to each of the file avatars in the jquery (caption can be overwritten within language files)
 minImageWidth | 0 | The minimum image width. Set to 0 for no min width image validation. All units from \Image::getPixelValue() are supported.
