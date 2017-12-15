@@ -443,6 +443,8 @@ class FormMultiFileUpload extends \Upload
             // allow safe mime types
             switch ($mimeDetected)
             {
+		// swf might be detected as `application/x-shockwave-flash` instead of `application/vnd.adobe.flash.movie`
+		case 'application/x-shockwave-flash':
                 // css files might be detected as the following instead of 'text/css'
                 case 'text/x-asm':
                 // csv files might be detected as the following instead of 'text/csv'
