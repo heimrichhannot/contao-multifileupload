@@ -334,6 +334,9 @@
                         config.url = HASTE_PLUS.addParametersToUri(config.url, params);
                     }
 
+                    console.log(field);
+                    console.log(config);
+
                     new Dropzone(field, config);
                 }
             }

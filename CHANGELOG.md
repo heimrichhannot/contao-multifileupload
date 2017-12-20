@@ -1,34 +1,40 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2017-12-20
+
+#### Added
+* support for [Multi Column Editor](https://github.com/heimrichhannot/contao-multi_column_editor)
+
+
 ## [1.4.5] - 2017-12-15
 
-### Added 
+#### Added 
 * added `application/x-shockwave-flash` to accepted mime-types
 
 ## [1.4.4] - 2017-11-07
 
-### Fixed 
+#### Fixed 
 * more fixed due changed introduced in 1.4.2
 
 ## [1.4.3] - 2017-11-07
 
-### Fixed 
+#### Fixed 
 * fixed config changes from 1.4.2
 
 ## [1.4.2] - 2017-11-07
 
-### Changed 
+#### Changed 
 * renamed shim repository
 
 ## [1.4.1] - 2017-11-07
 
-### Fixed 
+#### Fixed 
 * used wrong version in version compare
 
 ## [1.4.0] - 2017-11-06
 
-### Changed
+#### Changed
 * updated to dropzone 5
 
 ## [1.3.4] - 2017-11-06

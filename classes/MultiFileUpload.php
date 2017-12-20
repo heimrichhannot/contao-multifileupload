@@ -22,7 +22,7 @@ class MultiFileUpload extends \FileUpload
 {
     protected $arrData = [];
 
-    protected $strTemplate       = 'form_multifileupload_dropzone';
+    protected $strTemplate = 'form_multifileupload_dropzone';
     protected $strJQueryTemplate = 'j_multifileupload_dropzone';
 
     /**
@@ -41,6 +41,8 @@ class MultiFileUpload extends \FileUpload
 
     // prevent disk flooding violation
     const MAX_FILES_DEFAULT = 10;
+
+    const SESSION_FIELD_KEY = 'multifileupload_fields';
 
     /**
      * Has current page in xhtml type.
@@ -86,12 +88,10 @@ class MultiFileUpload extends \FileUpload
         if (stripos($size, 'K') !== false)
         {
             $size = round($size * 1024);
-        }
-        elseif (stripos($size, 'M') !== false)
+        } elseif (stripos($size, 'M') !== false)
         {
             $size = round($size * 1024 * 1024);
-        }
-        elseif (stripos($size, 'G') !== false)
+        } elseif (stripos($size, 'G') !== false)
         {
             $size = round($size * 1024 * 1024 * 1024);
         }
@@ -118,14 +118,12 @@ class MultiFileUpload extends \FileUpload
         if ($intMaxUploadSizeDca > $intMaxUploadSizeSettings)
         {
             $strError = 'The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in tl_settings.';
-        }
-        else
+        } else
         {
             if ($intMaxUploadSizeDca > $intMaxUploadSizePhp)
             {
                 $strError = 'The maximum upload size you defined in the dca for the field ' . $this->objWidget->name . ' exceeds the limit in php.ini.';
-            }
-            else
+            } else
             {
                 if ($intMaxUploadSizeSettings > $intMaxUploadSizePhp)
                 {
@@ -140,8 +138,7 @@ class MultiFileUpload extends \FileUpload
             if (TL_MODE == 'BE' && \BackendUser::getInstance()->isAdmin)
             {
                 throw new \Exception($strError);
-            }
-            else
+            } else
             {
                 \System::log($strError, __METHOD__, TL_ERROR);
             }
@@ -150,12 +147,10 @@ class MultiFileUpload extends \FileUpload
         if (!$intMaxUploadSizeDca && !$intMaxUploadSizeSettings)
         {
             return $intMaxUploadSizePhp;
-        }
-        elseif (!$intMaxUploadSizeDca)
+        } elseif (!$intMaxUploadSizeDca)
         {
             return min($intMaxUploadSizeSettings, $intMaxUploadSizePhp);
-        }
-        elseif (!$intMaxUploadSizeSettings)
+        } elseif (!$intMaxUploadSizeSettings)
         {
             return min($intMaxUploadSizeDca, $intMaxUploadSizePhp);
         }
@@ -171,8 +166,7 @@ class MultiFileUpload extends \FileUpload
         $this->acceptedFiles = implode(
             ',',
             array_map(
-                function ($a)
-                {
+                function ($a) {
                     return '.' . $a;
                 },
                 trimsplit(',', strtolower($this->extensions ?: \Config::get('uploadTypes')))
@@ -217,7 +211,7 @@ class MultiFileUpload extends \FileUpload
 
         $objT = new \FrontendTemplate($this->strTemplate);
         $objT->setData($this->arrData);
-        $objT->id                    = $this->strField;
+        $objT->id                    = $this->id;
         $objT->uploadMultiple        = $this->uploadMultiple;
         $objT->initialFiles          = json_encode($arrValues);
         $objT->initialFilesFormatted = $this->prepareValue();
@@ -225,6 +219,12 @@ class MultiFileUpload extends \FileUpload
         $objT->deletedFiles          = '[]';
         $objT->attributes            = $this->getAttributes($this->getDropZoneOptions());
         $objT->widget                = $this->objWidget;
+
+        // store in session to validate on upload that field is allowed by user
+        $fields                             = \Session::getInstance()->get(static::SESSION_FIELD_KEY);
+        $dca                                = $this->objWidget->arrDca;
+        $fields[$this->strTable][$this->id] = $dca;
+        \Session::getInstance()->set(static::SESSION_FIELD_KEY, $fields);
 
         return $objT->parse();
     }
@@ -263,8 +263,7 @@ class MultiFileUpload extends \FileUpload
             $varValue = $strKey;
 
             return $this->blnIsXhtml ? ' ' . $strKey . '="' . $varValue . '"' : ' ' . $strKey;
-        }
-        else
+        } else
         {
             return ' ' . $strKey . '="' . $varValue . '"';
         }
