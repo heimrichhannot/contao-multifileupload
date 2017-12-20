@@ -65,16 +65,26 @@ class FormMultiFileUpload extends \Upload
 
         if ($arrAttributes !== null && $arrAttributes['strTable'])
         {
-            $arrTableFields = \Database::getInstance()->listFields($arrAttributes['strTable']);
-
-            foreach ($arrTableFields as $arrField)
+            // no database field (e.g. multi_column_editor)
+            if (!\Database::getInstance()->fieldExists($arrAttributes['name'], $arrAttributes['strTable']) && $arrAttributes['fieldType'] === 'radio')
             {
-                if ($arrField['name'] == $arrAttributes['name'] && $arrField['type'] != 'index' && $arrField['type'] == 'binary')
+                $this->blnSingleFile = true;
+            }
+            // field exists, check database field type
+            else
+            {
+                $arrTableFields = \Database::getInstance()->listFields($arrAttributes['strTable']);
+
+                foreach ($arrTableFields as $arrField)
                 {
-                    $this->blnSingleFile = true;
-                    break;
+                    if ($arrField['name'] == $arrAttributes['name'] && $arrField['type'] != 'index' && $arrField['type'] == 'binary')
+                    {
+                        $this->blnSingleFile = true;
+                        break;
+                    }
                 }
             }
+
         }
 
         $arrAttributes['uploadAction'] = static::$uploadAction;
@@ -443,8 +453,8 @@ class FormMultiFileUpload extends \Upload
             // allow safe mime types
             switch ($mimeDetected)
             {
-		// swf might be detected as `application/x-shockwave-flash` instead of `application/vnd.adobe.flash.movie`
-		case 'application/x-shockwave-flash':
+                // swf might be detected as `application/x-shockwave-flash` instead of `application/vnd.adobe.flash.movie`
+                case 'application/x-shockwave-flash':
                 // css files might be detected as the following instead of 'text/css'
                 case 'text/x-asm':
                 // csv files might be detected as the following instead of 'text/csv'

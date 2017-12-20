@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2017-12-20
+
+#### Fixed
+* error from 1.5.0
+
 ## [1.5.0] - 2017-12-20
 
 #### Added
