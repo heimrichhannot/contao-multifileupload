@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         syntaxCheck="false"
-         bootstrap="bootstrap.php"
->
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.3/phpunit.xsd"
+        backupGlobals="false"
+        colors="true"
+        bootstrap="tests/bootstrap.php"
+        failOnRisky="true"
+        failOnWarning="true">
     <php>
+        <ini name="error_reporting" value="-1"/>
         <ini name="display_errors" value="1"/>
-        <!--<ini name="error_reporting" value="2147483647" />-->
         <ini name="display_startup_errors" value="1"/>
-        <ini name="intl.error_level" value="0"/>
-        <ini name="memory_limit" value="-1"/>
+        <ini name="intl.default_locale" value="en" />
+        <ini name="intl.error_level" value="0" />
     </php>
 
     <testsuites>
-        <testsuite name="Multifileupload Test Suite">
-            <directory>./tests/</directory>
+        <testsuite name="Contao Multifileupload Unit Tests">
+            <directory>./tests</directory>
         </testsuite>
     </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>./src</directory>
+            <exclude>
+                <directory>./src/Resources</directory>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>
