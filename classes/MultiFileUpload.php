@@ -13,10 +13,12 @@
 namespace HeimrichHannot\MultiFileUpload;
 
 use Contao\System;
+use Contao\Widget;
 use HeimrichHannot\Ajax\AjaxAction;
 use HeimrichHannot\Haste\Util\Files;
 use HeimrichHannot\Haste\Util\StringUtil;
 use HeimrichHannot\Haste\Util\Url;
+use HeimrichHannot\MultiFileUpload\Widget\BackendMultiFileUpload;
 
 class MultiFileUpload extends \FileUpload
 {
@@ -26,7 +28,7 @@ class MultiFileUpload extends \FileUpload
     protected $strJQueryTemplate = 'j_multifileupload_dropzone';
 
     /**
-     * @var FormMultiFileUpload
+     * @var BackendMultiFileUpload|Widget
      */
     protected $objWidget;
 
@@ -223,6 +225,10 @@ class MultiFileUpload extends \FileUpload
         // store in session to validate on upload that field is allowed by user
         $fields                             = \Session::getInstance()->get(static::SESSION_FIELD_KEY);
         $dca                                = $this->objWidget->arrDca;
+        if (!$dca)
+        {
+            $dca = $GLOBALS['TL_DCA'][$this->objWidget->strTable]['fields'][$this->objWidget->strField];
+        }
         $fields[$this->strTable][$this->id] = $dca;
         \Session::getInstance()->set(static::SESSION_FIELD_KEY, $fields);
 
