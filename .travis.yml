@@ -1,0 +1,26 @@
+language: php
+php:
+- 5.6
+- 7.0
+- 7.1
+- 7.2
+env:
+- CONTAO_VERSION="3.5.*"
+- CONTAO_VERSION="4.4.*"
+sudo: false
+notifications:
+  email:
+    recipients:
+    - digitales@heimrich-hannot.de
+    on_success: never
+    on_failure: always
+  hipchat:
+    rooms:
+      secure: LWgeOaj2H59eMdxn8daIVVqSFGLLm8AeoHeUFQkYzVmposr3AcYwuNIPeJI7YLi2knkHlbbE7b1OCCTGXSf0y7+PrytqKosgYWI2wCQ2cBAPa2/LeZYuNdQtSBa7Uguh+d7Axt40JyTGT/1j8eA7usgiN8dZuS9UUsao5hgbF0MAVLGbzJPmZvrs6SNtIz2dd/gdPeqOY+7Oh2TrdtL9Fb7m/YP4Y/egoakp/dmxPgN4hzEG/MLGsnPkrtT1jpajIeQk+KTLZ8b/x+3r9KnP1EdBZFmMc+CByz6uDNSdAj5rEnklUXnKNu3IYQcIkvJT7nSSRW3dDXLoihRMVy/ajOLcJgYeNtEbcUGMsBMpxT7WRIFaNpYrGOh3CeYGs1iUc2gctAQ4vlQU8V7RSbElFAQkedNoTNejTwbFSD7NFKb8rALQAOvvs7TdMVR0UHgA32yYwzrsRA5qUwz3wCPQQ/XWaAUpTRx0V3vd7AeoTTv0qUnf73+7uoaBDrZwethfANAELZ47JcCHw4XmvbsBfobHpVWVkwDP8x1YJZzT/3DdZ5yYPzj0tPlCA5T9QZTHR0acT3RN2TR8zaMnosQEZML4r3e8RuYk3KSeCKeCIl2YUNsGmhhQxWwQHPkbf6bCqlpmX/bppl/TBTXiPtdYWJeYqFXB11e+NB9UAXjkJVs=
+before_script:
+- travis_wait composer install --no-interaction
+script:
+- mkdir -p build/logs
+- php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+after_script:
+- php vendor/bin/coveralls
