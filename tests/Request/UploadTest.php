@@ -19,7 +19,7 @@ use HeimrichHannot\Haste\Util\Url;
 use HeimrichHannot\MultiFileUpload\FormMultiFileUpload;
 use HeimrichHannot\MultiFileUpload\MultiFileUpload;
 use HeimrichHannot\Request\Request;
-use \PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadTest extends TestCase
@@ -101,12 +101,11 @@ class UploadTest extends TestCase
         ];
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
-//        $upload = new MultiFileUpload($arrAttributes);
-//        $upload->generateMarkup();
 //        fwrite(STDERR, print_r($arrAttributes, TRUE));
 
+
         try {
-            $objUploader = new FormMultiFileUpload($arrAttributes);
+            $uploader = new FormMultiFileUpload($arrAttributes, true);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
         } catch (AjaxExitException $e) {
@@ -347,7 +346,7 @@ class UploadTest extends TestCase
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
         try {
-            $objUploader = new FormMultiFileUpload($arrAttributes);
+            $objUploader = new FormMultiFileUpload($arrAttributes, true);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
         } catch (AjaxExitException $e) {
@@ -444,7 +443,7 @@ class UploadTest extends TestCase
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
         try {
-            $objUploader = new FormMultiFileUpload($arrAttributes);
+            $objUploader = new FormMultiFileUpload($arrAttributes, true);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
         } catch (AjaxExitException $e) {

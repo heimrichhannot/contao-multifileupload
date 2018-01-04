@@ -12,6 +12,7 @@
 
 namespace HeimrichHannot\MultiFileUpload;
 
+use Contao\File;
 use Contao\FilesModel;
 use Contao\RequestToken;
 use Contao\Validator;
@@ -44,9 +45,16 @@ class FormMultiFileUpload extends \Upload
      */
     protected $blnSingleFile = false;
 
+    /**
+     * Don't add or update Database entries for uploadFile Method
+     *
+     * @var bool
+     */
+    public $noDatabaseInteraction = false;
+
     const UNIQID_PREFIX = 'mfuid';
 
-    public function __construct($arrAttributes = null)
+    public function __construct($arrAttributes = null, $noDatabaseInteraction = false)
     {
         // this is the case for 'onsubmit_callback' => 'multifileupload_moveFiles'
         if ($arrAttributes === null)
@@ -54,6 +62,7 @@ class FormMultiFileUpload extends \Upload
             $arrAttributes                     = [];
             $arrAttributes['isSubmitCallback'] = true;
         }
+        $this->noDatabaseInteraction = $noDatabaseInteraction;
 
         // check against arrAttributes, as 'onsubmit_callback' => 'multifileupload_moveFiles' does not provide valid attributes
         if (!$arrAttributes['isSubmitCallback'] && !$arrAttributes['uploadFolder'])
@@ -578,19 +587,27 @@ class FormMultiFileUpload extends \Upload
         $objFile  = null;
         $objModel = null;
 
+
+
         try
         {
             // add db record
-            $objFile = new \File($strRelativePath);
-            $objModel = $objFile->getModel();
-
-            // Update the database
-            if ($objModel === null && \Dbafs::shouldBeSynchronized($strRelativePath))
+            $objFile = new File($strRelativePath);
+            if (!$this->noDatabaseInteraction)
             {
-                $objModel = \Dbafs::addResource($strRelativePath);
+                $objModel = $objFile->getModel();
+
+                // Update the database
+                if ($objModel === null && \Dbafs::shouldBeSynchronized($strRelativePath))
+                {
+                    $objModel = \Dbafs::addResource($strRelativePath);
+                }
+                $strUuid  = $objFile->getModel()->uuid;
             }
 
-            $strUuid  = $objFile->getModel()->uuid;
+
+
+
         } catch (\InvalidArgumentException $e)
         {
             // remove file from file system
@@ -603,7 +620,7 @@ class FormMultiFileUpload extends \Upload
             ];
         }
 
-        if (!$objFile instanceof \File || $objModel === null)
+        if (!$objFile instanceof \File || ($objModel === null && !$this->noDatabaseInteraction))
         {
             // remove file from file system
             @unlink(TL_ROOT . '/' . $strRelativePath);
@@ -660,7 +677,7 @@ class FormMultiFileUpload extends \Upload
         $arrData['error'] = $error;
 
         // remove invalid files from tmp folder
-        if ($objFile instanceof \File)
+        if ($objFile instanceof File && !$this->noDatabaseInteraction)
         {
             $objFile->delete();
         }
