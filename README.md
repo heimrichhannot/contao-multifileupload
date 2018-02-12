@@ -3,8 +3,6 @@
 ![](https://img.shields.io/packagist/v/heimrichhannot/contao-multifileupload.svg)
 ![](https://img.shields.io/packagist/l/heimrichhannot/contao-multifileupload.svg)
 ![](https://img.shields.io/packagist/dt/heimrichhannot/contao-multifileupload.svg)
-[![](https://img.shields.io/travis/heimrichhannot/contao-multifileupload/master.svg)](https://travis-ci.org/heimrichhannot/contao-multifileupload/)
-[![](https://img.shields.io/coveralls/heimrichhannot/contao-multifileupload/master.svg)](https://coveralls.io/github/heimrichhannot/contao-multifileupload)
 
 Contao front end widget that provides [dropzonejs.com](http://www.dropzonejs.com/) functionality to both back and front end.
 The javascript is written in native javascript and invoked for both jquery and mootools on "document ready" and "ajax complete".

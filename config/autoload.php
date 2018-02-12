@@ -24,13 +24,13 @@ ClassLoader::addNamespaces(
 ClassLoader::addClasses(
     [
 	// Forms
-	'HeimrichHannot\MultiFileUpload\FormMultiFileUpload'           => 'system/modules/multifileupload/src/FormMultiFileUpload.php',
+	'HeimrichHannot\MultiFileUpload\FormMultiFileUpload'           => 'system/modules/multifileupload/forms/FormMultiFileUpload.php',
 
 	// Widgets
-	'HeimrichHannot\MultiFileUpload\Widget\BackendMultiFileUpload' => 'system/modules/multifileupload/src/Widget/BackendMultiFileUpload.php',
+	'HeimrichHannot\MultiFileUpload\Widget\BackendMultiFileUpload' => 'system/modules/multifileupload/widgets/BackendMultiFileUpload.php',
 
 	// Classes
-	'HeimrichHannot\MultiFileUpload\MultiFileUpload'               => 'system/modules/multifileupload/src/MultiFileUpload.php',]
+	'HeimrichHannot\MultiFileUpload\MultiFileUpload'               => 'system/modules/multifileupload/classes/MultiFileUpload.php',]
 );
 
 

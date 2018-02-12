@@ -10,8 +10,6 @@
 
 namespace HeimrichHannot\MultiFileUpload\Test;
 
-use Contao\System;
-use Contao\Widget;
 use HeimrichHannot\Ajax\Ajax;
 use HeimrichHannot\Ajax\AjaxAction;
 use HeimrichHannot\Ajax\Exception\AjaxExitException;
@@ -19,48 +17,10 @@ use HeimrichHannot\Haste\Util\Url;
 use HeimrichHannot\MultiFileUpload\FormMultiFileUpload;
 use HeimrichHannot\MultiFileUpload\MultiFileUpload;
 use HeimrichHannot\Request\Request;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class UploadTest extends TestCase
+class UploadTest extends \PHPUnit_Framework_TestCase
 {
-    static private $testfile = [
-        'file   name.zip',
-        'საბეჭდი_მანქანა.png',
-        '.~file   name#%&*{}:<>?+|"\'.zip',
-        'file___name.zip',
-        'file...name..zip',
-        'file name.zip',
-        'file--.--.-.--name.zip',
-        'file---name.zip',
-    ];
-
-    public static function setUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-        foreach (static::$testfile as $file)
-        {
-            @copy(UNIT_TESTING_FILES . '/filename.zip', UNIT_TESTING_FILES . '/'.$file);
-        }
-    }
-
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        foreach (static::$testfile as $file)
-        {
-            unlink(UNIT_TESTING_FILES.'/'.$file);
-        }
-    }
-
-    protected function setUp()
-    {
-        System::loadLanguageFile('default','de');
-        // reset request parameter bag
-        Request::set(new \Symfony\Component\HttpFoundation\Request());
-    }
-
-
     /**
      * test upload controller against cross-site request
      *
@@ -89,27 +49,24 @@ class UploadTest extends TestCase
 
         Request::set($objRequest);
 
-
-
         $arrDca = [
             'inputType' => 'multifileupload',
             'eval'      => [
                 'uploadFolder' => UNIT_TESTING_FILES . 'uploads/',
                 'extensions'   => 'zip',
                 'fieldType'    => 'radio',
-            ]
+            ],
         ];
 
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
-//        fwrite(STDERR, print_r($arrAttributes, TRUE));
-
 
         try {
-            $uploader = new FormMultiFileUpload($arrAttributes, true);
+            $objUploader = new FormMultiFileUpload($arrAttributes);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
         } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
+
             $this->assertSame('bmarquee-onscrollalert1file-name.zip', $objJson->result->data->filenameSanitized);
         }
     }
@@ -185,7 +142,7 @@ class UploadTest extends TestCase
             ],
         ];
 
-        $arrAttributes = Widget::getAttributesFromDca($arrDca, 'files');
+        $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
         try {
             $objUploader = new FormMultiFileUpload($arrAttributes);
@@ -193,6 +150,7 @@ class UploadTest extends TestCase
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
         } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
+
             $this->assertSame('Invalid ajax token.', $objJson->message);
         }
     }
@@ -346,7 +304,7 @@ class UploadTest extends TestCase
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
         try {
-            $objUploader = new FormMultiFileUpload($arrAttributes, true);
+            $objUploader = new FormMultiFileUpload($arrAttributes);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
         } catch (AjaxExitException $e) {
@@ -443,7 +401,7 @@ class UploadTest extends TestCase
         $arrAttributes = \Widget::getAttributesFromDca($arrDca, 'files');
 
         try {
-            $objUploader = new FormMultiFileUpload($arrAttributes, true);
+            $objUploader = new FormMultiFileUpload($arrAttributes);
             // unreachable code: if no exception is thrown after form was created, something went wrong
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
         } catch (AjaxExitException $e) {
@@ -493,7 +451,6 @@ class UploadTest extends TestCase
             $this->expectException(\HeimrichHannot\Ajax\Exception\AjaxExitException::class);
         } catch (AjaxExitException $e) {
             $objJson = json_decode($e->getMessage());
-            fwrite(STDERR, print_r($objJson, TRUE));
 
             $this->assertSame('Unerlaubter Dateityp: text/x-php', $objJson->result->data->error);
             $this->assertSame('cmd_test-php.jpg', $objJson->result->data->filenameSanitized);
@@ -555,6 +512,37 @@ class UploadTest extends TestCase
 
             $this->assertSame('Unerlaubte Dateiendung: php', $objJson->result->data[1]->error);
             $this->assertSame('cmd_test1.php', $objJson->result->data[1]->filenameSanitized);
+        }
+    }
+
+    protected function setUp()
+    {
+
+        $files = [
+            'საბეჭდი_მანქანა.png',
+            '.~file   name#%&*{}:<>?+|".zip',
+            'file___name.zip',
+            'file...name.zip',
+            'file name.zip',
+            'file--.--.-.--name.zip',
+            'file---name.zip',
+        ];
+
+        $this->createTestFiles($files);
+
+        // reset request parameter bag
+        Request::set(new \Symfony\Component\HttpFoundation\Request());
+    }
+
+    /**
+     * creates files for tests
+     *
+     * @param array $files
+     */
+    protected function createTestFiles(array $files)
+    {
+        foreach ($files as $file) {
+            $result = fopen(__DIR__ . '/../../../files/' . $file, 'c');
         }
     }
 }

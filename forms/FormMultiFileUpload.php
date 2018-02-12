@@ -12,9 +12,10 @@
 
 namespace HeimrichHannot\MultiFileUpload;
 
-use Contao\File;
+use Contao\CoreBundle\Command\SymlinksCommand;
 use Contao\FilesModel;
 use Contao\RequestToken;
+use Contao\System;
 use Contao\Validator;
 use HeimrichHannot\Ajax\Ajax;
 use HeimrichHannot\Ajax\AjaxAction;
@@ -24,6 +25,8 @@ use HeimrichHannot\Ajax\Response\ResponseSuccess;
 use HeimrichHannot\Haste\Util\Files;
 use HeimrichHannot\Haste\Util\StringUtil;
 use HeimrichHannot\Request\Request;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -45,49 +48,33 @@ class FormMultiFileUpload extends \Upload
      */
     protected $blnSingleFile = false;
 
-    /**
-     * Don't add or update Database entries for uploadFile Method
-     *
-     * @var bool
-     */
-    public $noDatabaseInteraction = false;
-
     const UNIQID_PREFIX = 'mfuid';
 
-    public function __construct($arrAttributes = null, $noDatabaseInteraction = false)
+    public function __construct($arrAttributes = null)
     {
         // this is the case for 'onsubmit_callback' => 'multifileupload_moveFiles'
-        if ($arrAttributes === null)
-        {
+        if ($arrAttributes === null) {
             $arrAttributes                     = [];
             $arrAttributes['isSubmitCallback'] = true;
         }
-        $this->noDatabaseInteraction = $noDatabaseInteraction;
 
         // check against arrAttributes, as 'onsubmit_callback' => 'multifileupload_moveFiles' does not provide valid attributes
-        if (!$arrAttributes['isSubmitCallback'] && !$arrAttributes['uploadFolder'])
-        {
+        if (!$arrAttributes['isSubmitCallback'] && !$arrAttributes['uploadFolder']) {
             throw new \Exception(
                 sprintf($GLOBALS['TL_LANG']['ERR']['noUploadFolderDeclared'], $this->name)
             );
         }
 
-        if ($arrAttributes !== null && $arrAttributes['strTable'])
-        {
+        if ($arrAttributes !== null && $arrAttributes['strTable']) {
             // no database field (e.g. multi_column_editor)
-            if (!\Database::getInstance()->fieldExists($arrAttributes['name'], $arrAttributes['strTable']) && $arrAttributes['fieldType'] === 'radio')
-            {
+            if (!\Database::getInstance()->fieldExists($arrAttributes['name'], $arrAttributes['strTable']) && $arrAttributes['fieldType'] === 'radio') {
                 $this->blnSingleFile = true;
-            }
-            // field exists, check database field type
-            else
-            {
+            } // field exists, check database field type
+            else {
                 $arrTableFields = \Database::getInstance()->listFields($arrAttributes['strTable']);
 
-                foreach ($arrTableFields as $arrField)
-                {
-                    if ($arrField['name'] == $arrAttributes['name'] && $arrField['type'] != 'index' && $arrField['type'] == 'binary')
-                    {
+                foreach ($arrTableFields as $arrField) {
+                    if ($arrField['name'] == $arrAttributes['name'] && $arrField['type'] != 'index' && $arrField['type'] == 'binary') {
                         $this->blnSingleFile = true;
                         break;
                     }
@@ -98,8 +85,7 @@ class FormMultiFileUpload extends \Upload
 
         $arrAttributes['uploadAction'] = static::$uploadAction;
 
-        if (TL_MODE == 'FE')
-        {
+        if (TL_MODE == 'FE') {
             $arrAttributes['uploadActionParams'] = http_build_query(AjaxAction::getParams(MultiFileUpload::NAME, static::$uploadAction));
         }
 
@@ -108,26 +94,20 @@ class FormMultiFileUpload extends \Upload
         $arrAttributes['addRemoveLinks'] = isset($arrAttributes['addRemoveLinks']) ? $arrAttributes['addRemoveLinks'] : true;
 
 
-        if (!is_array($arrAttributes['value']) && !Validator::isBinaryUuid($arrAttributes['value']))
-        {
+        if (!is_array($arrAttributes['value']) && !Validator::isBinaryUuid($arrAttributes['value'])) {
             $arrAttributes['value'] = json_decode($arrAttributes['value']);
         }
 
         // bin to string -> never pass binary to the widget!!
-        if ($arrAttributes['value'])
-        {
-            if (is_array($arrAttributes['value']))
-            {
+        if ($arrAttributes['value']) {
+            if (is_array($arrAttributes['value'])) {
                 $arrAttributes['value'] = array_map(
-                    function ($val)
-                    {
+                    function ($val) {
                         return \Validator::isBinaryUuid($val) ? \StringUtil::binToUuid($val) : $val;
                     },
                     $arrAttributes['value']
                 );
-            }
-            else
-            {
+            } else {
                 $arrAttributes['value'] = [
                     \Validator::isBinaryUuid($arrAttributes['value']) ? \StringUtil::binToUuid(
                         $arrAttributes['value']
@@ -142,20 +122,16 @@ class FormMultiFileUpload extends \Upload
 
         $arrAttributes = array_merge($arrAttributes, $this->objUploader->getData());
 
-        foreach ($arrAttributes as $strKey => $varValue)
-        {
+        foreach ($arrAttributes as $strKey => $varValue) {
             $this->{$strKey} = $varValue;
         }
 
         // add onsubmit_callback at first onsubmit_callback position: move files after form submission
-        if (is_array($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']))
-        {
+        if (is_array($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback'])) {
             $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback'] =
                 ['multifileupload_moveFiles' => ['HeimrichHannot\MultiFileUpload\FormMultiFileUpload', 'moveFiles']]
                 + $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback'];
-        }
-        else
-        {
+        } else {
             $GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']['multifileupload_moveFiles'] = ['HeimrichHannot\MultiFileUpload\FormMultiFileUpload', 'moveFiles'];
         }
 
@@ -166,12 +142,10 @@ class FormMultiFileUpload extends \Upload
     {
         $arrPost = Request::getPost();
 
-        foreach ($arrPost as $key => $value)
-        {
+        foreach ($arrPost as $key => $value) {
             $arrData = $GLOBALS['TL_DCA'][$dc->table]['fields'][$key];
 
-            if ($arrData['inputType'] != MultiFileUpload::NAME)
-            {
+            if ($arrData['inputType'] != MultiFileUpload::NAME) {
                 continue;
             }
 
@@ -179,22 +153,19 @@ class FormMultiFileUpload extends \Upload
 
             $strUploadFolder = Files::getFolderFromDca($arrData['eval']['uploadFolder'], $dc);
 
-            if ($strUploadFolder === null)
-            {
+            if ($strUploadFolder === null) {
                 throw new \Exception(
                     sprintf($GLOBALS['TL_LANG']['ERR']['uploadNoUploadFolderDeclared'], $key, MultiFileUpload::UPLOAD_TMP)
                 );
             }
 
-            if (!is_array($arrFiles))
-            {
+            if (!is_array($arrFiles)) {
                 $arrFiles = [$arrFiles];
             }
 
             $objFileModels = FilesModel::findMultipleByUuids($arrFiles);
 
-            if ($objFileModels === null)
-            {
+            if ($objFileModels === null) {
                 continue;
             }
 
@@ -202,35 +173,29 @@ class FormMultiFileUpload extends \Upload
             $arrTargets = [];
 
             // do not loop over $objFileModels as $objFile->close() will pull models away
-            foreach ($arrPaths as $strPath)
-            {
+            foreach ($arrPaths as $strPath) {
                 $objFile   = new \File($strPath);
                 $strTarget = $strTarget = $strUploadFolder . '/' . $objFile->name;
 
                 // upload_path_callback
-                if (is_array($arrData['upload_path_callback']))
-                {
-                    foreach ($arrData['upload_path_callback'] as $callback)
-                    {
+                if (is_array($arrData['upload_path_callback'])) {
+                    foreach ($arrData['upload_path_callback'] as $callback) {
                         $strTarget = \System::importStatic($callback[0])->{$callback[1]}($strTarget, $objFile, $dc) ?: $strTarget;
                     }
                 }
 
-                if (StringUtil::startsWith($objFile->path, ltrim($strTarget, '/')))
-                {
+                if (StringUtil::startsWith($objFile->path, ltrim($strTarget, '/'))) {
                     continue;
                 }
 
                 $strTarget = Files::getUniqueFileNameWithinTarget($strTarget, static::UNIQID_PREFIX);
 
-                if ($objFile->renameTo($strTarget))
-                {
+                if ($objFile->renameTo($strTarget)) {
                     $arrTargets[] = $strTarget;
-                    $objModel = $objFile->getModel();
+                    $objModel     = $objFile->getModel();
 
                     // Update the database
-                    if ($objModel === null && \Dbafs::shouldBeSynchronized($strTarget))
-                    {
+                    if ($objModel === null && \Dbafs::shouldBeSynchronized($strTarget)) {
                         $objModel = \Dbafs::addResource($strTarget);
                     }
 
@@ -241,16 +206,11 @@ class FormMultiFileUpload extends \Upload
             }
 
             // HOOK: post upload callback
-            if (isset($GLOBALS['TL_HOOKS']['postUpload']) && is_array($GLOBALS['TL_HOOKS']['postUpload']))
-            {
-                foreach ($GLOBALS['TL_HOOKS']['postUpload'] as $callback)
-                {
-                    if (is_array($callback))
-                    {
+            if (isset($GLOBALS['TL_HOOKS']['postUpload']) && is_array($GLOBALS['TL_HOOKS']['postUpload'])) {
+                foreach ($GLOBALS['TL_HOOKS']['postUpload'] as $callback) {
+                    if (is_array($callback)) {
                         \System::importStatic($callback[0])->{$callback[1]}($arrTargets);
-                    }
-                    elseif (is_callable($callback))
-                    {
+                    } elseif (is_callable($callback)) {
                         $callback($arrTargets);
                     }
                 }
@@ -261,29 +221,37 @@ class FormMultiFileUpload extends \Upload
     public function upload()
     {
         // check for the request token
-        if (!Request::hasPost('requestToken') || !RequestToken::validate(Request::getPost('requestToken')))
-        {
+        if (!Request::hasPost('requestToken') || !RequestToken::validate(Request::getPost('requestToken'))) {
             $objResponse = new ResponseError();
             $objResponse->setMessage('Invalid Request Token!');
             $objResponse->output();
         }
 
-        if (!Request::getInstance()->files->has($this->name))
-        {
+        if (!Request::getInstance()->files->has($this->name)) {
             return;
         }
 
         $objTmpFolder = new \Folder(MultiFileUpload::UPLOAD_TMP);
 
+        // contao 4 support, create tmp dir symlink
+        if (version_compare(VERSION, '4.0', '>=')) {
+            // tmp directory is not public, mandatory for preview images
+            if (!file_exists(System::getContainer()->getParameter('contao.web_dir') . DIRECTORY_SEPARATOR . MultiFileUpload::UPLOAD_TMP)) {
+                $objTmpFolder->unprotect();
+                $command = new SymlinksCommand();
+                $command->setContainer(System::getContainer());
+                $input      = new ArrayInput([]);
+                $output     = new NullOutput();
+                $command->run($input, $output);
+            }
+        }
+
         $strField = $this->name;
         $varFile  = Request::getInstance()->files->get($strField);
-
         // Multi-files upload at once
-        if (is_array($varFile))
-        {
+        if (is_array($varFile)) {
             // prevent disk flooding
-            if (count($varFile) > $this->maxFiles)
-            {
+            if (count($varFile) > $this->maxFiles) {
                 $objResponse = new ResponseError();
                 $objResponse->setMessage('Bulk file upload violation.');
                 $objResponse->output();
@@ -292,33 +260,27 @@ class FormMultiFileUpload extends \Upload
             /**
              * @var UploadedFile $objFile
              */
-            foreach ($varFile as $strKey => $objFile)
-            {
+            foreach ($varFile as $strKey => $objFile) {
                 $arrFile     = $this->uploadFile($objFile, $objTmpFolder->path, $strField);
                 $varReturn[] = $arrFile;
 
-                if (\Validator::isUuid($arrFile['uuid']))
-                {
+                if (\Validator::isUuid($arrFile['uuid'])) {
                     $arrUuids[] = $arrFile['uuid'];
                 }
             }
-        }
-        // Single-file upload
-        else
-        {
+        } // Single-file upload
+        else {
             /**
              * @var UploadedFile $varFile
              */
             $varReturn = $this->uploadFile($varFile, $objTmpFolder->path, $strField);
 
-            if (\Validator::isUuid($varReturn['uuid']))
-            {
+            if (\Validator::isUuid($varReturn['uuid'])) {
                 $arrUuids[] = $varReturn['uuid'];
             }
         }
 
-        if ($varReturn !== null)
-        {
+        if ($varReturn !== null) {
             $this->varValue = $arrUuids;
             $objResponse    = new ResponseSuccess();
             $objResult      = new ResponseData();
@@ -331,8 +293,7 @@ class FormMultiFileUpload extends \Upload
 
     public function generateLabel()
     {
-        if ($this->strLabel == '')
-        {
+        if ($this->strLabel == '') {
             return '';
         }
 
@@ -348,8 +309,7 @@ class FormMultiFileUpload extends \Upload
 
     public function validator($varInput)
     {
-        if ($varInput == '' || $varInput == '[]')
-        {
+        if ($varInput == '' || $varInput == '[]') {
             $varInput = '[]';
         }
 
@@ -357,19 +317,14 @@ class FormMultiFileUpload extends \Upload
         $arrDeleted = json_decode(($this->getPost('deleted_' . $this->strName)));
         $blnEmpty   = false;
 
-        if (is_array($arrFiles) && is_array($arrDeleted))
-        {
+        if (is_array($arrFiles) && is_array($arrDeleted)) {
             $blnEmpty = empty(array_diff($arrFiles, $arrDeleted));
         }
 
-        if ($this->mandatory && $blnEmpty)
-        {
-            if ($this->strLabel == '')
-            {
+        if ($this->mandatory && $blnEmpty) {
+            if ($this->strLabel == '') {
                 $this->addError($GLOBALS['TL_LANG']['ERR']['mdtryNoLabel']);
-            }
-            else
-            {
+            } else {
                 $this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['mandatory'], $this->strLabel));
             }
 
@@ -377,44 +332,35 @@ class FormMultiFileUpload extends \Upload
             return;
         }
 
-        if (!$this->skipDeleteAfterSubmit)
-        {
+        if (!$this->skipDeleteAfterSubmit) {
             $this->deleteScheduledFiles($arrDeleted);
         }
 
-        if (is_array($arrFiles))
-        {
-            foreach ($arrFiles as $k => $v)
-            {
-                if (!\Validator::isUuid($v))
-                {
+        if (is_array($arrFiles)) {
+            foreach ($arrFiles as $k => $v) {
+                if (!\Validator::isUuid($v)) {
                     $this->addError($GLOBALS['TL_LANG']['ERR']['invalidUuid']);
 
                     return;
                 }
 
                 // cleanup non existing files on save
-                if (($objFile = Files::getFileFromUuid($v)) === null || !$objFile->exists())
-                {
+                if (($objFile = Files::getFileFromUuid($v)) === null || !$objFile->exists()) {
                     unset($arrFiles[$k]);
                     continue;
                 }
 
                 $arrFiles[$k] = \StringUtil::uuidToBin($v);
             }
-        }
-        else
-        {
-            if (!\Validator::isUuid($arrFiles))
-            {
+        } else {
+            if (!\Validator::isUuid($arrFiles)) {
                 $this->addError($GLOBALS['TL_LANG']['ERR']['invalidUuid']);
 
                 return;
             }
 
             // cleanup non existing files on save
-            if (($objFile = Files::getFileFromUuid($arrFiles)) === null || !$objFile->exists())
-            {
+            if (($objFile = Files::getFileFromUuid($arrFiles)) === null || !$objFile->exists()) {
                 return;
             }
 
@@ -441,14 +387,12 @@ class FormMultiFileUpload extends \Upload
 
         $strExtension = $objUploadFile->getClientOriginalExtension();
 
-        if (!$strExtension || !is_array($arrAllowed) || !in_array($strExtension, $arrAllowed))
-        {
+        if (!$strExtension || !is_array($arrAllowed) || !in_array($strExtension, $arrAllowed)) {
             return sprintf(sprintf($GLOBALS['TL_LANG']['ERR']['illegalFileExtension'], $strExtension));
         }
 
         // compare client mime type with mime type check result from server (e.g. user uploaded a php file with jpg extension)
-        if (!$this->validateMimeType($objUploadFile->getClientMimeType(), $objUploadFile->getMimeType()))
-        {
+        if (!$this->validateMimeType($objUploadFile->getClientMimeType(), $objUploadFile->getMimeType())) {
             return sprintf(sprintf($GLOBALS['TL_LANG']['ERR']['illegalMimeType'], $objUploadFile->getMimeType()));
         }
 
@@ -457,16 +401,14 @@ class FormMultiFileUpload extends \Upload
 
     protected function validateMimeType($mimeClient, $mimeDetected)
     {
-        if ($mimeClient !== $mimeDetected)
-        {
+        if ($mimeClient !== $mimeDetected) {
             // allow safe mime types
-            switch ($mimeDetected)
-            {
+            switch ($mimeDetected) {
                 // swf might be detected as `application/x-shockwave-flash` instead of `application/vnd.adobe.flash.movie`
                 case 'application/x-shockwave-flash':
-                // css files might be detected as the following instead of 'text/css'
+                    // css files might be detected as the following instead of 'text/css'
                 case 'text/x-asm':
-                // csv files might be detected as the following instead of 'text/csv'
+                    // csv files might be detected as the following instead of 'text/csv'
                 case 'text/plain':
                 case 'text/csv':
                 case 'text/x-csv':
@@ -494,31 +436,26 @@ class FormMultiFileUpload extends \Upload
     {
         $error = false;
 
-        if ($objFile->isImage)
-        {
+        if ($objFile->isImage) {
             $minWidth  = \Image::getPixelValue($this->minImageWidth);
             $minHeight = \Image::getPixelValue($this->minImageHeight);
 
             $maxWidth  = \Image::getPixelValue($this->maxImageWidth);
             $maxHeight = \Image::getPixelValue($this->maxImageHeight);
 
-            if ($minWidth > 0 && $objFile->width < $minWidth)
-            {
+            if ($minWidth > 0 && $objFile->width < $minWidth) {
                 return sprintf($this->minImageWidthErrorText ?: $GLOBALS['TL_LANG']['ERR']['minWidth'], $minWidth, $objFile->width);
             }
 
-            if ($minHeight > 0 && $objFile->height < $minHeight)
-            {
+            if ($minHeight > 0 && $objFile->height < $minHeight) {
                 return sprintf($this->minImageHeightErrorText ?: $GLOBALS['TL_LANG']['ERR']['minHeight'], $minHeight, $objFile->height);
             }
 
-            if ($maxWidth > 0 && $objFile->width > $maxWidth)
-            {
+            if ($maxWidth > 0 && $objFile->width > $maxWidth) {
                 return sprintf($this->maxImageWidthErrorText ?: $GLOBALS['TL_LANG']['ERR']['maxWidth'], $maxWidth, $objFile->width);
             }
 
-            if ($maxHeight > 0 && $objFile->height > $maxHeight)
-            {
+            if ($maxHeight > 0 && $objFile->height > $maxHeight) {
                 return sprintf($this->maxImageHeightErrorText ?: $GLOBALS['TL_LANG']['ERR']['maxHeight'], $maxHeight, $objFile->height);
             }
         }
@@ -542,8 +479,7 @@ class FormMultiFileUpload extends \Upload
         $strOriginalFileNameEncoded = rawurlencode($strOriginalFileName);
         $strSanitizedFileName       = Files::sanitizeFileName($objUploadFile->getClientOriginalName());
 
-        if ($objUploadFile->getError())
-        {
+        if ($objUploadFile->getError()) {
             return [
                 'error'               => $objUploadFile->getError(),
                 'filenameOrigEncoded' => $strOriginalFileNameEncoded,
@@ -555,8 +491,7 @@ class FormMultiFileUpload extends \Upload
 
         $strTargetFileName = Files::addUniqIdToFilename($strSanitizedFileName, static::UNIQID_PREFIX);
 
-        if (($error = $this->validateExtension($objUploadFile)) !== false)
-        {
+        if (($error = $this->validateExtension($objUploadFile)) !== false) {
             return [
                 'error'               => $error,
                 'filenameOrigEncoded' => $strOriginalFileNameEncoded,
@@ -564,11 +499,9 @@ class FormMultiFileUpload extends \Upload
             ];
         }
 
-        try
-        {
+        try {
             $objUploadFile = $objUploadFile->move(TL_ROOT . '/' . $strUploadFolder, $strTargetFileName);
-        } catch (FileException $e)
-        {
+        } catch (FileException $e) {
             return [
                 'error'               => sprintf($GLOBALS['TL_LANG']['ERR']['moveUploadFile'], $e->getMessage()),
                 'filenameOrigEncoded' => $strOriginalFileNameEncoded,
@@ -587,29 +520,18 @@ class FormMultiFileUpload extends \Upload
         $objFile  = null;
         $objModel = null;
 
-
-
-        try
-        {
+        try {
             // add db record
-            $objFile = new File($strRelativePath);
-            if (!$this->noDatabaseInteraction)
-            {
-                $objModel = $objFile->getModel();
+            $objFile  = new \File($strRelativePath);
+            $objModel = $objFile->getModel();
 
-                // Update the database
-                if ($objModel === null && \Dbafs::shouldBeSynchronized($strRelativePath))
-                {
-                    $objModel = \Dbafs::addResource($strRelativePath);
-                }
-                $strUuid  = $objFile->getModel()->uuid;
+            // Update the database
+            if ($objModel === null && \Dbafs::shouldBeSynchronized($strRelativePath)) {
+                $objModel = \Dbafs::addResource($strRelativePath);
             }
 
-
-
-
-        } catch (\InvalidArgumentException $e)
-        {
+            $strUuid = $objFile->getModel()->uuid;
+        } catch (\InvalidArgumentException $e) {
             // remove file from file system
             @unlink(TL_ROOT . '/' . $strRelativePath);
 
@@ -620,8 +542,7 @@ class FormMultiFileUpload extends \Upload
             ];
         }
 
-        if (!$objFile instanceof \File || ($objModel === null && !$this->noDatabaseInteraction))
-        {
+        if (!$objFile instanceof \File || $objModel === null) {
             // remove file from file system
             @unlink(TL_ROOT . '/' . $strRelativePath);
 
@@ -632,8 +553,7 @@ class FormMultiFileUpload extends \Upload
             ];
         }
 
-        if (($error = $this->validateUpload($objFile)) !== false)
-        {
+        if (($error = $this->validateUpload($objFile)) !== false) {
             return [
                 'error'               => $error,
                 'filenameOrigEncoded' => $strOriginalFileNameEncoded,
@@ -642,24 +562,19 @@ class FormMultiFileUpload extends \Upload
         }
 
         // upload_path_callback
-        if (is_array($this->validate_upload_callback))
-        {
-            foreach ($this->validate_upload_callback as $callback)
-            {
-                if (!class_exists($callback[0]))
-                {
+        if (is_array($this->validate_upload_callback)) {
+            foreach ($this->validate_upload_callback as $callback) {
+                if (!class_exists($callback[0])) {
                     continue;
                 }
 
                 $objCallback = \System::importStatic($callback[0]);
 
-                if (!method_exists($objCallback, $callback[1]))
-                {
+                if (!method_exists($objCallback, $callback[1])) {
                     continue;
                 }
 
-                if ($errorCallback = $objCallback->{$callback[1]}($objFile, $this))
-                {
+                if ($errorCallback = $objCallback->{$callback[1]}($objFile, $this)) {
                     $error = $errorCallback;
                     break; // stop validation on first error
                 }
@@ -667,8 +582,7 @@ class FormMultiFileUpload extends \Upload
         }
 
 
-        if ($error === false && ($arrInfo = $this->objUploader->prepareFile($strUuid)) !== false)
-        {
+        if ($error === false && ($arrInfo = $this->objUploader->prepareFile($strUuid)) !== false) {
             $arrData = array_merge($arrData, $arrInfo);
 
             return $arrData;
@@ -677,8 +591,7 @@ class FormMultiFileUpload extends \Upload
         $arrData['error'] = $error;
 
         // remove invalid files from tmp folder
-        if ($objFile instanceof File && !$this->noDatabaseInteraction)
-        {
+        if ($objFile instanceof \File) {
             $objFile->delete();
         }
 
@@ -694,17 +607,13 @@ class FormMultiFileUpload extends \Upload
     {
         $arrFiles = [];
 
-        if (empty($arrScheduledFiles))
-        {
+        if (empty($arrScheduledFiles)) {
             return $arrFiles;
         }
 
-        foreach ($arrScheduledFiles as $strUuid)
-        {
-            if (($objFile = Files::getFileFromUuid($strUuid, true)) !== null && $objFile->exists())
-            {
-                if ($objFile->delete() === true)
-                {
+        foreach ($arrScheduledFiles as $strUuid) {
+            if (($objFile = Files::getFileFromUuid($strUuid, true)) !== null && $objFile->exists()) {
+                if ($objFile->delete() === true) {
                     $arrFiles[] = $strUuid;
                 }
             }

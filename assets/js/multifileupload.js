@@ -144,8 +144,8 @@
                                 if ((objHandler = handleResponse(file, response[i])) !== false) {
                                     file = objHandler;
                                     persistFile(file, uploaded, filesToSave);
-                                    if (file.url) {
-                                        dropzone.createThumbnailFromUrl(file, file.url);
+                                    if (file.dataURL) {
+                                        dropzone.emit('thumbnail', file, file.dataURL);
                                     }
                                     __registerOnClick(file, file.info);
                                     break; // if file found break
@@ -156,8 +156,8 @@
                             if ((objHandler = handleResponse(file, response)) !== false) {
                                 file = objHandler;
                                 persistFile(file, uploaded, filesToSave);
-                                if (file.url) {
-                                    dropzone.createThumbnailFromUrl(file, file.url);
+                                if (file.dataURL) {
+                                    dropzone.emit('thumbnail', file, file.dataURL);
                                 }
                                 __registerOnClick(file, file.info);
                             }
@@ -264,8 +264,8 @@
 
                             this.files.push(mock);
                             this.emit('addedfile', mock);
-                            if (mock.url) {
-                                this.createThumbnailFromUrl(mock, mock.url);
+                            if (mock.dataURL) {
+                                this.emit('thumbnail', mock, mock.dataURL);
                             }
                             __registerOnClick(mock, mock.info);
                             this.emit('complete', mock);
@@ -333,9 +333,6 @@
                         var params = HASTE_PLUS.parseQueryString(config.uploadActionParams);
                         config.url = HASTE_PLUS.addParametersToUri(config.url, params);
                     }
-
-                    console.log(field);
-                    console.log(config);
 
                     new Dropzone(field, config);
                 }

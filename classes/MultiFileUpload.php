@@ -392,7 +392,7 @@ class MultiFileUpload extends \FileUpload
 
             if (($strImage = $this->getPreviewImage($objFile)) !== null)
             {
-                $arrReturn['url'] = $strImage;
+                $arrReturn['dataURL'] = $strImage;
             }
 
             if (($strInfoUrl = $this->getInfoAction($objFile)) !== null)

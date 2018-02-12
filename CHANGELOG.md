@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.5.3] - 2018-02-12
+
+### Fixed
+* image/thumbnail preview for initial images
+* image/thumbnail preview layout / alignment (center icons and limit max-width)
+* removed `console.log()` messages
+
+### Added
+* `.public` file for contao 4.x inside `/files/tmp` and run `contao::symlinks` command to provide proper thumbnail support   
+
 ## [1.5.2] - 2018-01-03
 
 #### Fixed
