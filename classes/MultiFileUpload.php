@@ -329,6 +329,7 @@ class MultiFileUpload extends \FileUpload
             case 'addRemoveLinks':
             case 'thumbnailWidth':
             case 'thumbnailHeight':
+	    case 'timeout':
             case 'previewsContainer':
                 $varValue = $this->arrData[$strKey];
                 break;
